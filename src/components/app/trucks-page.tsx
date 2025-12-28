@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
   Table,
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, ArrowUpDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,14 +22,60 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+type Truck = {
+  truckNumber: string;
+  location: string;
+  route: string;
+  geofence: string;
+  driver: string;
+  status: string;
+};
+
 export function TrucksPage() {
-  const trucks = [
+  const trucksData: Truck[] = [
     { truckNumber: '387445', location: 'Los Angeles, CA', route: 'LAX-01', geofence: 'LAX Distribution Center', driver: 'John Doe', status: 'Driving' },
     { truckNumber: '219876', location: 'Phoenix, AZ', route: 'PHX-03', geofence: 'Phoenix Warehouse', driver: 'Jane Smith', status: 'Idling' },
     { truckNumber: '554321', location: 'Denver, CO', route: 'DEN-02', geofence: 'Denver Hub', driver: 'Mike Johnson', status: 'On' },
     { truckNumber: '987654', location: 'Las Vegas, NV', route: 'LVS-05', geofence: 'Las Vegas Depot', driver: 'Emily Davis', status: 'Driving' },
     { truckNumber: '123789', location: 'San Francisco, CA', route: 'SFO-04', geofence: 'SFO Logistics', driver: 'Chris Lee', status: 'On' },
   ];
+
+  const [sortConfig, setSortConfig] = useState<{ key: keyof Truck; direction: 'ascending' | 'descending' } | null>(null);
+
+  const sortedTrucks = useMemo(() => {
+    let sortableItems = [...trucksData];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'ascending' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [trucksData, sortConfig]);
+
+  const requestSort = (key: keyof Truck) => {
+    let direction: 'ascending' | 'descending' = 'ascending';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIndicator = (key: keyof Truck) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    }
+    if (sortConfig.direction === 'ascending') {
+      return <ArrowUpDown className="ml-2 h-4 w-4" />;
+    }
+    return <ArrowUpDown className="ml-2 h-4 w-4" />;
+  };
+
 
   const getStatusVariant = (status: string) => {
     switch (status) {
@@ -55,19 +102,44 @@ export function TrucksPage() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Truck Number</TableHead>
-              <TableHead>Current Location</TableHead>
-              <TableHead>Route</TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => requestSort('truckNumber')}>
+                  Truck Number
+                  {getSortIndicator('truckNumber')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => requestSort('location')}>
+                  Current Location
+                  {getSortIndicator('location')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => requestSort('route')}>
+                  Route
+                  {getSortIndicator('route')}
+                </Button>
+              </TableHead>
               <TableHead>Geofence Address</TableHead>
-              <TableHead>Driver</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => requestSort('driver')}>
+                  Driver
+                  {getSortIndicator('driver')}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => requestSort('status')}>
+                  Status
+                  {getSortIndicator('status')}
+                </Button>
+              </TableHead>
               <TableHead>
                 <span className="sr-only">Actions</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trucks.map((truck) => (
+            {sortedTrucks.map((truck) => (
               <TableRow key={truck.truckNumber}>
                 <TableCell className="font-medium">{truck.truckNumber}</TableCell>
                 <TableCell>{truck.location}</TableCell>
