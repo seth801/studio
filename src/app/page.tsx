@@ -1,10 +1,7 @@
-import { CodeCraftCopilotPage } from '@/components/app/codecraft-copilot-page';
-import { CopilotProvider } from '@/components/app/copilot-context';
+import { DeliveryOpsPage } from '@/components/app/delivery-ops-page';
 
 export default function Home() {
   return (
-    <CopilotProvider>
-      <CodeCraftCopilotPage />
-    </CopilotProvider>
+    <DeliveryOpsPage />
   );
 }
