@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from '../ui/input';
 
-export function DeliveryOpsPage() {
+export function DeliveryOpsDashboard() {
   const runs = [
     { id: 'RUN-001', truckId: 'TRUCK-A', status: 'In Progress', driver: 'John Doe', startTime: '08:00 AM' },
     { id: 'RUN-002', truckId: 'TRUCK-B', status: 'Completed', driver: 'Jane Smith', startTime: '09:30 AM' },

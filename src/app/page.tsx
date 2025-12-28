@@ -1,7 +1,5 @@
-import { DeliveryOpsPage } from '@/components/app/delivery-ops-page';
+import { DeliveryOpsDashboard } from '@/components/app/delivery-ops-dashboard';
 
 export default function Home() {
-  return (
-    <DeliveryOpsPage />
-  );
+  return <DeliveryOpsDashboard />;
 }
