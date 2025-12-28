@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from '../ui/input';
 import { BillingPage } from './billing-page';
+import { TrucksPage } from './trucks-page';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -154,6 +155,8 @@ export function DeliveryOpsDashboard() {
           </Card>
           </>
         );
+      case 'trucks':
+        return <TrucksPage />;
       case 'billing':
         return <BillingPage />;
       default:
