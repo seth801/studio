@@ -31,15 +31,15 @@ type Truck = {
   status: string;
 };
 
-export function TrucksPage() {
-  const trucksData: Truck[] = [
-    { truckNumber: '387445', location: 'Los Angeles, CA', route: 'LAX-01', geofence: 'LAX Distribution Center', driver: 'John Doe', status: 'Driving' },
-    { truckNumber: '219876', location: 'Phoenix, AZ', route: 'PHX-03', geofence: 'Phoenix Warehouse', driver: 'Jane Smith', status: 'Idling' },
-    { truckNumber: '554321', location: 'Denver, CO', route: 'DEN-02', geofence: 'Denver Hub', driver: 'Mike Johnson', status: 'On' },
-    { truckNumber: '987654', location: 'Las Vegas, NV', route: 'LVS-05', geofence: 'Las Vegas Depot', driver: 'Emily Davis', status: 'Driving' },
-    { truckNumber: '123789', location: 'San Francisco, CA', route: 'SFO-04', geofence: 'SFO Logistics', driver: 'Chris Lee', status: 'On' },
-  ];
+const trucksData: Truck[] = [
+  { truckNumber: '387445', location: 'Los Angeles, CA', route: 'LAX-01', geofence: 'LAX Distribution Center', driver: 'John Doe', status: 'Driving' },
+  { truckNumber: '219876', location: 'Phoenix, AZ', route: 'PHX-03', geofence: 'Phoenix Warehouse', driver: 'Jane Smith', status: 'Idling' },
+  { truckNumber: '554321', location: 'Denver, CO', route: 'DEN-02', geofence: 'Denver Hub', driver: 'Mike Johnson', status: 'On' },
+  { truckNumber: '987654', location: 'Las Vegas, NV', route: 'LVS-05', geofence: 'Las Vegas Depot', driver: 'Emily Davis', status: 'Driving' },
+  { truckNumber: '123789', location: 'San Francisco, CA', route: 'SFO-04', geofence: 'SFO Logistics', driver: 'Chris Lee', status: 'On' },
+];
 
+export function TrucksPage() {
   const [sortConfig, setSortConfig] = useState<{ key: keyof Truck; direction: 'ascending' | 'descending' } | null>(null);
 
   const sortedTrucks = useMemo(() => {
@@ -56,7 +56,7 @@ export function TrucksPage() {
       });
     }
     return sortableItems;
-  }, [trucksData, sortConfig]);
+  }, [sortConfig]);
 
   const requestSort = (key: keyof Truck) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -70,9 +70,7 @@ export function TrucksPage() {
     if (!sortConfig || sortConfig.key !== key) {
       return <ArrowUpDown className="ml-2 h-4 w-4" />;
     }
-    if (sortConfig.direction === 'ascending') {
-      return <ArrowUpDown className="ml-2 h-4 w-4" />;
-    }
+    // Icons can be changed to up/down arrows based on direction if desired
     return <ArrowUpDown className="ml-2 h-4 w-4" />;
   };
 
