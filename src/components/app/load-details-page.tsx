@@ -11,6 +11,7 @@ import { MapPin, Clock, Truck, User, Milestone, Calendar, ArrowRight, Weight, Dr
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { Input } from '../ui/input';
+import { format } from 'date-fns';
 
 function GoogleMapEmbed({ stops }: { stops: { location: string }[] }) {
     if (!stops || stops.length === 0) {
@@ -271,3 +272,5 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
     </div>
   );
 }
+
+    
