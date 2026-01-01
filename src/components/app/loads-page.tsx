@@ -34,6 +34,13 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 
+export type Stop = {
+  type: 'pickup' | 'delivery';
+  location: string;
+  date: string;
+  time: string;
+};
+
 export type Load = {
   id: string;
   brokerName: string;
@@ -41,6 +48,7 @@ export type Load = {
   destination: string;
   pickupDate: Date;
   dropDate: Date;
+  stops: Stop[];
   driver: string;
   truck: string;
   miles: number;
@@ -52,11 +60,11 @@ export type Load = {
 };
 
 export const initialLoadsData: Load[] = [
-    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, estProfit: 250, status: 'Booked' },
-    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, estProfit: 400, status: 'In-transit' },
-    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, estProfit: 200, status: 'Delivered' },
-    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date('2025-12-30'), dropDate: new Date('2026-01-01'), driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, estProfit: 500, status: 'Booked' },
-    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, estProfit: 225, status: 'Delivered' },
+    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), stops: [{type: 'pickup', location: '123 Main St, West Valley City, UT 84119', date: '2025-12-29', time: '08:00 EST'}, {type: 'delivery', location: '456 Center St, Boise, ID 83702', date: '2025-12-30', time: '14:00 PST'}], driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, estProfit: 250, status: 'Booked' },
+    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), stops: [{type: 'pickup', location: '789 Grand Ave, Phoenix, AZ 85001', date: '2025-12-28', time: '09:00 MST'}, {type: 'delivery', location: '101 Broadway, Denver, CO 80203', date: '2025-12-29', time: '16:00 MST'}], driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, estProfit: 400, status: 'In-transit' },
+    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), stops: [{type: 'pickup', location: '212 Fremont St, Las Vegas, NV 89101', date: '2025-12-27', time: '10:00 PST'}, {type: 'delivery', location: '313 Hollywood Blvd, Los Angeles, CA 90028', date: '2025-12-27', time: '15:00 PST'}], driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, estProfit: 200, status: 'Delivered' },
+    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date('2025-12-30'), dropDate: new Date('2026-01-01'), stops: [{type: 'pickup', location: '414 Lombard St, San Francisco, CA 94133', date: '2025-12-30', time: '11:00 PST'}, {type: 'delivery', location: '515 Pike St, Seattle, WA 98101', date: '2026-01-01', time: '18:00 PST'}], driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, estProfit: 500, status: 'Booked' },
+    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), stops: [{type: 'pickup', location: '616 Temple Square, Salt Lake City, UT 84150', date: '2025-12-26', time: '12:00 MST'}, {type: 'delivery', location: '717 Virginia St, Reno, NV 89501', date: '2025-12-27', time: '19:00 PST'}], driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, estProfit: 225, status: 'Delivered' },
 ];
 
 export const allDrivers = [
@@ -320,5 +328,3 @@ export function LoadsPage() {
     </Card>
   );
 }
-
-    
