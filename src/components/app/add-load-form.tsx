@@ -15,6 +15,35 @@ import { Label } from '@/components/ui/label';
 import { Loader2, UploadCloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { extractRateCon } from '@/ai/flows/extract-rate-con-flow';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+const suggestedDrivers = [
+  { id: 'driver-007', name: 'John Doe' },
+  { id: 'driver-009', name: 'Emily Davis' },
+];
+
+const allDrivers = [
+  { id: 'driver-001', name: 'Jane Smith' },
+  { id: 'driver-002', name: 'Mike Johnson' },
+  { id: 'driver-003', name: 'Chris Lee' },
+];
+
+const suggestedTrucks = [{ id: 'truck-b', name: 'TRUCK-B' }];
+
+const allTrucks = [
+  { id: 'truck-a', name: 'TRUCK-A' },
+  { id: 'truck-c', name: 'TRUCK-C' },
+  { id: 'truck-d', name: 'TRUCK-D' },
+  { id: 'truck-e', name: 'TRUCK-E' },
+];
 
 export function AddLoadForm() {
   const { toast } = useToast();
@@ -194,11 +223,57 @@ export function AddLoadForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="truck">Assign Truck</Label>
-              <Input id="truck" value={truck} onChange={(e) => setTruck(e.target.value)} placeholder="e.g., TRUCK-A" />
+              <Select onValueChange={setTruck} value={truck}>
+                <SelectTrigger id="truck">
+                  <SelectValue placeholder="Unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  <SelectGroup>
+                    <SelectLabel>Suggested</SelectLabel>
+                    {suggestedTrucks.map((truck) => (
+                      <SelectItem key={truck.id} value={truck.id}>
+                        {truck.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel>Available</SelectLabel>
+                    {allTrucks.map((truck) => (
+                      <SelectItem key={truck.id} value={truck.id}>
+                        {truck.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="driver">Assign Driver</Label>
-              <Input id="driver" value={driver} onChange={(e) => setDriver(e.target.value)} placeholder="e.g., John Doe" />
+              <Select onValueChange={setDriver} value={driver}>
+                <SelectTrigger id="driver">
+                  <SelectValue placeholder="Unassigned" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  <SelectGroup>
+                    <SelectLabel>Suggested</SelectLabel>
+                    {suggestedDrivers.map((driver) => (
+                      <SelectItem key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                  <SelectGroup>
+                    <SelectLabel>Available</SelectLabel>
+                    {allDrivers.map((driver) => (
+                      <SelectItem key={driver.id} value={driver.id}>
+                        {driver.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex justify-end">
