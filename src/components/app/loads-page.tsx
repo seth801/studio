@@ -2,6 +2,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -33,7 +34,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 
-type Load = {
+export type Load = {
   id: string;
   brokerName: string;
   origin: string;
@@ -50,7 +51,7 @@ type Load = {
   status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending';
 };
 
-const initialLoadsData: Load[] = [
+export const initialLoadsData: Load[] = [
     { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, estProfit: 250, status: 'Booked' },
     { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, estProfit: 400, status: 'In-transit' },
     { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, estProfit: 200, status: 'Delivered' },
@@ -58,7 +59,7 @@ const initialLoadsData: Load[] = [
     { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, estProfit: 225, status: 'Delivered' },
 ];
 
-const allDrivers = [
+export const allDrivers = [
   { id: 'driver-007', name: 'John Doe' },
   { id: 'driver-009', name: 'Emily Davis' },
   { id: 'driver-001', name: 'Jane Smith' },
@@ -66,7 +67,7 @@ const allDrivers = [
   { id: 'driver-003', name: 'Chris Lee' },
 ];
 
-const allTrucks = [
+export const allTrucks = [
   { id: 'truck-a', name: 'TRUCK-A' },
   { id: 'truck-b', name: 'TRUCK-B' },
   { id: 'truck-c', name: 'TRUCK-C' },
@@ -186,7 +187,9 @@ export function LoadsPage() {
                 <TableBody>
                   {sortedLoads.map((load) => (
                     <TableRow key={load.id}>
-                      <TableCell className="font-medium">{load.id}</TableCell>
+                      <TableCell className="font-medium">
+                        <Link href={`/load/${load.id}`} className='text-primary hover:underline'>{load.id}</Link>
+                      </TableCell>
                       <TableCell>{load.brokerName}</TableCell>
                       <TableCell>{load.origin}</TableCell>
                       <TableCell>{load.destination}</TableCell>
@@ -317,9 +320,5 @@ export function LoadsPage() {
     </Card>
   );
 }
-
-    
-
-    
 
     

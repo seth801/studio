@@ -256,7 +256,7 @@ export function DeliveryOpsDashboard() {
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-[60px] items-center border-b px-6">
               <a href="/" className="flex items-center gap-2 font-semibold">
-                <Logo className="h-8 w-auto text-primary" />
+                <Logo className="h-8 w-8 text-primary" />
                 <span className="group-data-[collapsible=icon]:hidden">Ideal Delivery Ops</span>
               </a>
             </div>
@@ -277,7 +277,7 @@ export function DeliveryOpsDashboard() {
               <SheetContent side="left" className="sm:max-w-xs bg-card p-0">
                 <div className="flex h-[60px] items-center border-b px-6">
                   <a href="/" className="flex items-center gap-2 font-semibold">
-                    <Logo className="h-8 w-auto text-primary" />
+                    <Logo className="h-8 w-8 text-primary" />
                     <span className="">Ideal Delivery Ops</span>
                   </a>
                 </div>
@@ -335,3 +335,6 @@ export function DeliveryOpsDashboard() {
     </SidebarProvider>
   );
 }
+
+    
+    

@@ -1,98 +1,43 @@
-import React from 'react';
+import * as React from 'react';
 
-export function Logo(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="132"
-      height="40"
-      viewBox="0 0 132 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      {...props}
-    >
-      <g clipPath="url(#clip0_106_2)">
-        <path
-          d="M0 0H24.3854V24.3854H0V0Z"
-          fill="hsl(var(--primary))"
-        />
-        <path
-          d="M27.2734 39.8182V17.0455C27.2734 17.0455 27.2734 8.52273 35.7961 8.52273C44.3188 8.52273 52.8415 17.0455 52.8415 17.0455V22.7273C52.8415 22.7273 52.8415 31.25 44.3188 31.25C35.7961 31.25 27.2734 39.8182 27.2734 39.8182Z"
-          fill="hsl(var(--foreground))"
-        />
-        <path
-          d="M60.1136 22.7273V8.52273C60.1136 8.52273 60.1136 0 68.6364 0C77.1591 0 85.6818 8.52273 85.6818 8.52273V22.7273C85.6818 22.7273 85.6818 31.25 77.1591 31.25C68.6364 31.25 60.1136 22.7273 60.1136 22.7273Z"
-          fill="hsl(var(--foreground))"
-        />
-        <path
-          d="M92.9545 39.8182V25.5227C92.9545 25.5227 92.9545 17.0909 101.477 17.0909C110 17.0909 118.523 25.5227 118.523 25.5227V39.8182H132V25.5227C132 25.5227 132 8.52273 114.261 8.52273C96.5227 8.52273 92.9545 22.7273 92.9545 22.7273"
-          fill="hsl(var(--foreground))"
-        />
-        <path
-          d="M48.2273 17.6136L50.5682 14.7727"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M40.9091 21.0227L43.25 18.1818"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M33.5909 24.4318L35.9318 21.5909"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M81.0682 17.6136L83.4091 14.7727"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M73.75 21.0227L76.0909 18.1818"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M66.4318 24.4318L68.7727 21.5909"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M113.841 26.1364L116.182 23.2955"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M106.523 29.5455L108.864 26.7045"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M99.2045 32.9545L101.545 30.1136"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-        <path
-          d="M125.159 34.0909L127.5 31.25"
-          stroke="hsl(var(--background))"
-          strokeWidth="2.84091"
-          strokeLinecap="round"
-        />
-      </g>
-      <defs>
-        <clipPath id="clip0_106_2">
-          <rect width="132" height="40" fill="white" />
-        </clipPath>
-      </defs>
-    </svg>
-  );
-}
+export const Logo = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 256 256"
+    width="1em"
+    height="1em"
+    {...props}
+  >
+    <path fill="none" d="M0 0h256v256H0z" />
+    <path
+      fill="hsl(var(--primary))"
+      d="M188.4 46.6a97 97 0 0 0-120.8 0 8 8 0 1 0 8 14.8 81 81 0 0 1 104.8 0 8 8 0 1 0 8-14.8Z"
+    />
+    <path
+      fill="hsl(var(--primary))"
+      d="M128 24a8 8 0 0 0-8 8v16a8 8 0 0 0 16 0V32a8 8 0 0 0-8-8Z"
+    />
+    <path
+      fill="hsl(var(--primary))"
+      d="M149.2 165.2a8 8 0 0 0-8-4.8H116a8 8 0 0 0-4.8 14.8l20 20a8 8 0 0 0 11.2-11.2Z"
+    />
+    <path
+      fill="hsl(var(--primary))"
+      d="M192 72a8 8 0 0 0-8 8v16h-16a8 8 0 0 0 0 16h16v36a8 8 0 0 0 8 8h12a8 8 0 0 0 8-8v-68a8 8 0 0 0-8-8Z"
+    />
+    <path
+      fill="hsl(var(--primary))"
+      d="M96 96H80V80a8 8 0 0 0-16 0v16H48a8 8 0 0 0-8 8v12a8 8 0 0 0 8 8h52a8 8 0 0 0 8-8V80a8 8 0 0 0-8-8H88a8 8 0 0 0-8 8v16a8 8 0 0 0 8 8h8a8 8 0 0 0 0-16Z"
+    />
+    <path
+      fill="hsl(var(--primary) / .5)"
+      stroke="hsl(var(--primary))"
+      strokeWidth={16}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="m162.4 195.2 20-36a8 8 0 0 0-13.6-8l-20 36a8 8 0 1 0 13.6 8Z"
+    />
+  </svg>
+);
+
+    
