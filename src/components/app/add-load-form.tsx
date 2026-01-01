@@ -12,9 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, UploadCloud } from 'lucide-react';
+import { Loader2, UploadCloud, PlusCircle, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { extractRateCon } from '@/ai/flows/extract-rate-con-flow';
+import { extractRateCon, Stop } from '@/ai/flows/extract-rate-con-flow';
 import {
   Select,
   SelectContent,
@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Separator } from '../ui/separator';
 
 const suggestedDrivers = [
   { id: 'driver-007', name: 'John Doe' },
@@ -54,13 +55,12 @@ export function AddLoadForm() {
   const [loadNumber, setLoadNumber] = useState('');
   const [truck, setTruck] = useState('');
   const [driver, setDriver] = useState('');
+  
+  const [stops, setStops] = useState<Stop[]>([
+    { type: 'pickup', location: '', date: '', time: '' },
+    { type: 'delivery', location: '', date: '', time: '' },
+  ]);
 
-  const [pickupLocation, setPickupLocation] = useState('');
-  const [pickupDate, setPickupDate] = useState('');
-  const [pickupTime, setPickupTime] = useState('');
-  const [deliveryLocation, setDeliveryLocation] = useState('');
-  const [deliveryDate, setDeliveryDate] = useState('');
-  const [deliveryTime, setDeliveryTime] = useState('');
   const [commodity, setCommodity] = useState('');
   const [weight, setWeight] = useState('');
   const [rate, setRate] = useState('');
@@ -94,12 +94,9 @@ export function AddLoadForm() {
 
         setBroker(result.broker);
         setLoadNumber(result.loadNumber);
-        setPickupLocation(result.pickupLocation);
-        setPickupDate(result.pickupDate);
-        setPickupTime(result.pickupTime);
-        setDeliveryLocation(result.deliveryLocation);
-        setDeliveryDate(result.deliveryDate);
-        setDeliveryTime(result.deliveryTime);
+        if (result.stops && result.stops.length > 0) {
+            setStops(result.stops);
+        }
         setCommodity(result.commodity);
         setWeight(result.weight.toString());
         setRate(result.rate.toString());
@@ -129,6 +126,21 @@ export function AddLoadForm() {
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  const handleStopChange = (index: number, field: keyof Stop, value: string) => {
+    const newStops = [...stops];
+    newStops[index] = { ...newStops[index], [field]: value };
+    setStops(newStops);
+  };
+
+  const addStop = () => {
+    setStops([...stops, { type: 'delivery', location: '', date: '', time: '' }]);
+  };
+
+  const removeStop = (index: number) => {
+    const newStops = stops.filter((_, i) => i !== index);
+    setStops(newStops);
   };
 
 
@@ -179,34 +191,34 @@ export function AddLoadForm() {
               <Label htmlFor="load-number">Load Number</Label>
               <Input id="load-number" value={loadNumber} onChange={(e) => setLoadNumber(e.target.value)} placeholder="e.g., LD-123456" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="pickup-location">Pickup Location</Label>
-              <Input id="pickup-location" value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} placeholder="e.g., West Valley City, UT" />
-            </div>
-            <div className="grid grid-cols-2 gap-x-4">
-                <div className='space-y-2'>
-                    <Label htmlFor="pickup-date">Pickup Date</Label>
-                    <Input id="pickup-date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} placeholder="e.g., 12/29/2025" />
+            <div className="col-span-2 space-y-4">
+              {stops.map((stop, index) => (
+                <div key={index} className="space-y-4 rounded-md border p-4">
+                    <div className="flex justify-between items-center">
+                        <Label className="capitalize font-semibold">{stop.type} #{stops.filter(s => s.type === stop.type).map(s => s.location).indexOf(stop.location) + 1}</Label>
+                        {stops.length > 2 && <Button variant="ghost" size="icon" onClick={() => removeStop(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Location</Label>
+                        <Input value={stop.location} onChange={(e) => handleStopChange(index, 'location', e.target.value)} placeholder="e.g., West Valley City, UT" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-4">
+                        <div className="space-y-2">
+                            <Label>Date</Label>
+                            <Input value={stop.date} onChange={(e) => handleStopChange(index, 'date', e.target.value)} placeholder="e.g., 12/29/2025" />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Time</Label>
+                            <Input value={stop.time} onChange={(e) => handleStopChange(index, 'time', e.target.value)} placeholder="e.g., 08:00-14:00" />
+                        </div>
+                    </div>
                 </div>
-                <div className='space-y-2'>
-                    <Label htmlFor="pickup-time">Pickup Time</Label>
-                    <Input id="pickup-time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} placeholder="e.g., 08:00-14:00" />
-                </div>
+              ))}
+               <Button variant="outline" size="sm" onClick={addStop}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Add Stop
+              </Button>
             </div>
-             <div className="space-y-2">
-              <Label htmlFor="delivery-location">Delivery Location</Label>
-              <Input id="delivery-location" value={deliveryLocation} onChange={(e) => setDeliveryLocation(e.target.value)} placeholder="e.g., Boise, ID" />
-            </div>
-             <div className="grid grid-cols-2 gap-x-4">
-                <div className='space-y-2'>
-                    <Label htmlFor="delivery-date">Delivery Date</Label>
-                    <Input id="delivery-date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} placeholder="e.g., 12/30/2025" />
-                </div>
-                <div className='space-y-2'>
-                    <Label htmlFor="delivery-time">Delivery Time</Label>
-                    <Input id="delivery-time" value={deliveryTime} onChange={(e) => setDeliveryTime(e.target.value)} placeholder="e.g., 08:00" />
-                </div>
-            </div>
+            <Separator className="col-span-2" />
              <div className="space-y-2">
               <Label htmlFor="commodity">Commodity</Label>
               <Input id="commodity" value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="e.g., Dry Goods" />
