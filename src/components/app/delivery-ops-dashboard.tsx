@@ -116,7 +116,7 @@ export function DeliveryOpsDashboard() {
                   <TableRow>
                     <TableHead>Run ID</TableHead>
                     <TableHead>Driver</TableHead>
-                    <TableHead>Truck Number</TableHead>
+                    <TableHead>Truck</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Start Time</TableHead>
                     <TableHead>
