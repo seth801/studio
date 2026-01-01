@@ -7,7 +7,7 @@ import { allDrivers, allTrucks, initialLoadsData, type Load, type Stop } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Separator } from '../ui/separator';
-import { MapPin, Clock, Truck, User, Milestone, Calendar, ArrowRight, Weight, DraftingCompass, Pencil } from 'lucide-react';
+import { MapPin, Clock, Truck, User, Milestone, Calendar, ArrowRight, Weight, Pencil } from 'lucide-react';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import { Input } from '../ui/input';
@@ -249,7 +249,7 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
                     </div>
                      <div className="flex items-center justify-between">
                         <span className="text-muted-foreground flex items-center gap-2"><Weight className='h-4 w-4'/> Commodity</span>
-                        <span>Dry Goods, 31200 lbs</span>
+                        <span>Dry Goods, {currentLoad.stops[0].location.includes('31200') ? '31200' : 'N/A'} lbs</span>
                     </div>
                     <Separator />
                     <div className='flex flex-col gap-2'>
@@ -272,5 +272,3 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
     </div>
   );
 }
-
-    
