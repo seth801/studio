@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '../ui/separator';
+import { ScrollArea } from '../ui/scroll-area';
 
 const suggestedDrivers = [
   { id: 'driver-007', name: 'John Doe' },
@@ -182,115 +183,117 @@ export function AddLoadForm() {
           </div>
         </TabsContent>
         <TabsContent value="manual">
-          <div className="grid grid-cols-2 gap-x-8 gap-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="broker">Broker</Label>
-              <Input id="broker" value={broker} onChange={(e) => setBroker(e.target.value)} placeholder="e.g., CH Robinson" />
+          <ScrollArea className="h-[60vh] pr-6">
+            <div className="grid grid-cols-2 gap-x-8 gap-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="broker">Broker</Label>
+                <Input id="broker" value={broker} onChange={(e) => setBroker(e.target.value)} placeholder="e.g., CH Robinson" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="load-number">Load Number</Label>
+                <Input id="load-number" value={loadNumber} onChange={(e) => setLoadNumber(e.target.value)} placeholder="e.g., LD-123456" />
+              </div>
+              <div className="col-span-2 space-y-4">
+                {stops.map((stop, index) => (
+                  <div key={index} className="space-y-4 rounded-md border p-4">
+                      <div className="flex justify-between items-center">
+                          <Label className="capitalize font-semibold">{stop.type} #{stops.filter(s => s.type === stop.type).map(s => s.location).indexOf(stop.location) + 1}</Label>
+                          {stops.length > 2 && <Button variant="ghost" size="icon" onClick={() => removeStop(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
+                      </div>
+                      <div className="space-y-2">
+                          <Label>Location</Label>
+                          <Input value={stop.location} onChange={(e) => handleStopChange(index, 'location', e.target.value)} placeholder="e.g., West Valley City, UT" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4">
+                          <div className="space-y-2">
+                              <Label>Date</Label>
+                              <Input value={stop.date} onChange={(e) => handleStopChange(index, 'date', e.target.value)} placeholder="e.g., 12/29/2025" />
+                          </div>
+                          <div className="space-y-2">
+                              <Label>Time</Label>
+                              <Input value={stop.time} onChange={(e) => handleStopChange(index, 'time', e.target.value)} placeholder="e.g., 08:00-14:00" />
+                          </div>
+                      </div>
+                  </div>
+                ))}
+                <Button variant="outline" size="sm" onClick={addStop}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add Stop
+                </Button>
+              </div>
+              <Separator className="col-span-2" />
+              <div className="space-y-2">
+                <Label htmlFor="commodity">Commodity</Label>
+                <Input id="commodity" value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="e.g., Dry Goods" />
+              </div>
+              <div className="grid grid-cols-2 gap-x-4">
+                  <div className='space-y-2'>
+                      <Label htmlFor="weight">Weight (lbs)</Label>
+                      <Input id="weight" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g., 31200" />
+                  </div>
+                  <div className='space-y-2'>
+                      <Label htmlFor="rate">Rate ($)</Label>
+                      <Input id="rate" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="e.g., 800" />
+                  </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="truck">Assign Truck</Label>
+                <Select onValueChange={setTruck} value={truck}>
+                  <SelectTrigger id="truck">
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    <SelectGroup>
+                      <SelectLabel>Suggested</SelectLabel>
+                      {suggestedTrucks.map((truck) => (
+                        <SelectItem key={truck.id} value={truck.id}>
+                          {truck.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Available</SelectLabel>
+                      {allTrucks.map((truck) => (
+                        <SelectItem key={truck.id} value={truck.id}>
+                          {truck.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="driver">Assign Driver</Label>
+                <Select onValueChange={setDriver} value={driver}>
+                  <SelectTrigger id="driver">
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                    <SelectGroup>
+                      <SelectLabel>Suggested</SelectLabel>
+                      {suggestedDrivers.map((driver) => (
+                        <SelectItem key={driver.id} value={driver.id}>
+                          {driver.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                    <SelectGroup>
+                      <SelectLabel>Available</SelectLabel>
+                      {allDrivers.map((driver) => (
+                        <SelectItem key={driver.id} value={driver.id}>
+                          {driver.name}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="load-number">Load Number</Label>
-              <Input id="load-number" value={loadNumber} onChange={(e) => setLoadNumber(e.target.value)} placeholder="e.g., LD-123456" />
+            <div className="flex justify-end pt-4">
+              <Button>Save Load</Button>
             </div>
-            <div className="col-span-2 space-y-4">
-              {stops.map((stop, index) => (
-                <div key={index} className="space-y-4 rounded-md border p-4">
-                    <div className="flex justify-between items-center">
-                        <Label className="capitalize font-semibold">{stop.type} #{stops.filter(s => s.type === stop.type).map(s => s.location).indexOf(stop.location) + 1}</Label>
-                        {stops.length > 2 && <Button variant="ghost" size="icon" onClick={() => removeStop(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Location</Label>
-                        <Input value={stop.location} onChange={(e) => handleStopChange(index, 'location', e.target.value)} placeholder="e.g., West Valley City, UT" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4">
-                        <div className="space-y-2">
-                            <Label>Date</Label>
-                            <Input value={stop.date} onChange={(e) => handleStopChange(index, 'date', e.target.value)} placeholder="e.g., 12/29/2025" />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Time</Label>
-                            <Input value={stop.time} onChange={(e) => handleStopChange(index, 'time', e.target.value)} placeholder="e.g., 08:00-14:00" />
-                        </div>
-                    </div>
-                </div>
-              ))}
-               <Button variant="outline" size="sm" onClick={addStop}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add Stop
-              </Button>
-            </div>
-            <Separator className="col-span-2" />
-             <div className="space-y-2">
-              <Label htmlFor="commodity">Commodity</Label>
-              <Input id="commodity" value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="e.g., Dry Goods" />
-            </div>
-             <div className="grid grid-cols-2 gap-x-4">
-                <div className='space-y-2'>
-                    <Label htmlFor="weight">Weight (lbs)</Label>
-                    <Input id="weight" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g., 31200" />
-                </div>
-                <div className='space-y-2'>
-                    <Label htmlFor="rate">Rate ($)</Label>
-                    <Input id="rate" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="e.g., 800" />
-                </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="truck">Assign Truck</Label>
-              <Select onValueChange={setTruck} value={truck}>
-                <SelectTrigger id="truck">
-                  <SelectValue placeholder="Unassigned" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
-                  <SelectGroup>
-                    <SelectLabel>Suggested</SelectLabel>
-                    {suggestedTrucks.map((truck) => (
-                      <SelectItem key={truck.id} value={truck.id}>
-                        {truck.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                  <SelectGroup>
-                    <SelectLabel>Available</SelectLabel>
-                    {allTrucks.map((truck) => (
-                      <SelectItem key={truck.id} value={truck.id}>
-                        {truck.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="driver">Assign Driver</Label>
-              <Select onValueChange={setDriver} value={driver}>
-                <SelectTrigger id="driver">
-                  <SelectValue placeholder="Unassigned" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
-                  <SelectGroup>
-                    <SelectLabel>Suggested</SelectLabel>
-                    {suggestedDrivers.map((driver) => (
-                      <SelectItem key={driver.id} value={driver.id}>
-                        {driver.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                  <SelectGroup>
-                    <SelectLabel>Available</SelectLabel>
-                    {allDrivers.map((driver) => (
-                      <SelectItem key={driver.id} value={driver.id}>
-                        {driver.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="flex justify-end">
-            <Button>Save Load</Button>
-          </div>
+          </ScrollArea>
         </TabsContent>
       </Tabs>
     </DialogContent>
