@@ -25,6 +25,8 @@ import { Input } from '../ui/input';
 import { BillingPage } from './billing-page';
 import { TrucksPage } from './trucks-page';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
+import { Dialog, DialogTrigger } from '../ui/dialog';
+import { AddLoadForm } from './add-load-form';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -256,10 +258,15 @@ export function DeliveryOpsDashboard() {
               </div>
             </form>
           </div>
-          <Button variant="outline">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Load
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Load
+              </Button>
+            </DialogTrigger>
+            <AddLoadForm />
+          </Dialog>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
