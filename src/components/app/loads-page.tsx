@@ -169,7 +169,7 @@ export function LoadsPage() {
             <TabsTrigger value="board">Board</TabsTrigger>
             <TabsTrigger value="availability">Availability</TabsTrigger>
           </TabsList>
-          <TabsContent value="table" className="w-full overflow-auto">
+          <TabsContent value="table">
             <Table>
                 <TableHeader>
                   <TableRow>
