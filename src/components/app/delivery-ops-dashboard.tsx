@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard } from 'lucide-react';
+import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -256,6 +256,10 @@ export function DeliveryOpsDashboard() {
               </div>
             </form>
           </div>
+          <Button variant="outline">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add Load
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
