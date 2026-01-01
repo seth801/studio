@@ -170,145 +170,143 @@ export function LoadsPage() {
             <TabsTrigger value="availability">Availability</TabsTrigger>
           </TabsList>
           <TabsContent value="table">
-            <div className="overflow-x-auto">
-              <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead><Button variant="ghost" onClick={() => requestSort('id')}>Load # {getSortIndicator('id')}</Button></TableHead>
-                      <TableHead><Button variant="ghost" onClick={() => requestSort('brokerName')}>Broker {getSortIndicator('brokerName')}</Button></TableHead>
-                      <TableHead><Button variant="ghost" onClick={() => requestSort('origin')}>Origin {getSortIndicator('origin')}</Button></TableHead>
-                      <TableHead><Button variant="ghost" onClick={() => requestSort('destination')}>Destination {getSortIndicator('destination')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('pickupDate')}>Pickup Date {getSortIndicator('pickupDate')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('dropDate')}>Drop Date {getSortIndicator('dropDate')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('driver')}>Driver {getSortIndicator('driver')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('truck')}>Truck {getSortIndicator('truck')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('miles')}>Miles {getSortIndicator('miles')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('hours')}>Hours {getSortIndicator('hours')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('perMileRate')}>$/Mile {getSortIndicator('perMileRate')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('estProfit')}>Est Profit {getSortIndicator('estProfit')}</Button></TableHead>
-                      <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
-                      <TableHead>
-                        <span className="sr-only">Actions</span>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedLoads.map((load) => (
-                      <TableRow key={load.id}>
-                        <TableCell className="font-medium">
-                          <Link href={`/load/${load.id}`} className='text-primary hover:underline'>{load.id}</Link>
-                        </TableCell>
-                        <TableCell>{load.brokerName}</TableCell>
-                        <TableCell>{load.origin}</TableCell>
-                        <TableCell>{load.destination}</TableCell>
-                        <TableCell className="text-center">
-                          <Popover>
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('id')}>Load # {getSortIndicator('id')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('brokerName')}>Broker {getSortIndicator('brokerName')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('origin')}>Origin {getSortIndicator('origin')}</Button></TableHead>
+                    <TableHead><Button variant="ghost" onClick={() => requestSort('destination')}>Destination {getSortIndicator('destination')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('pickupDate')}>Pickup Date {getSortIndicator('pickupDate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('dropDate')}>Drop Date {getSortIndicator('dropDate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('driver')}>Driver {getSortIndicator('driver')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('truck')}>Truck {getSortIndicator('truck')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('miles')}>Miles {getSortIndicator('miles')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('hours')}>Hours {getSortIndicator('hours')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('perMileRate')}>$/Mile {getSortIndicator('perMileRate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('estProfit')}>Est Profit {getSortIndicator('estProfit')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
+                    <TableHead>
+                      <span className="sr-only">Actions</span>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedLoads.map((load) => (
+                    <TableRow key={load.id}>
+                      <TableCell className="font-medium">
+                        <Link href={`/load/${load.id}`} className='text-primary hover:underline'>{load.id}</Link>
+                      </TableCell>
+                      <TableCell>{load.brokerName}</TableCell>
+                      <TableCell>{load.origin}</TableCell>
+                      <TableCell>{load.destination}</TableCell>
+                      <TableCell className="text-center">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[140px] justify-start text-left font-normal",
+                                    !load.pickupDate && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {load.pickupDate ? format(load.pickupDate, "M/d/yy") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={load.pickupDate}
+                                onSelect={(date) => handleFieldChange(load.id, 'pickupDate', date)}
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Popover>
                               <PopoverTrigger asChild>
                                   <Button
                                   variant={"outline"}
                                   className={cn(
                                       "w-[140px] justify-start text-left font-normal",
-                                      !load.pickupDate && "text-muted-foreground"
+                                      !load.dropDate && "text-muted-foreground"
                                   )}
                                   >
                                   <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {load.pickupDate ? format(load.pickupDate, "M/d/yy") : <span>Pick a date</span>}
+                                  {load.dropDate ? format(load.dropDate, "M/d/yy") : <span>Pick a date</span>}
                                   </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0">
                                   <Calendar
                                   mode="single"
-                                  selected={load.pickupDate}
-                                  onSelect={(date) => handleFieldChange(load.id, 'pickupDate', date)}
+                                  selected={load.dropDate}
+                                  onSelect={(date) => handleFieldChange(load.id, 'dropDate', date)}
                                   initialFocus
                                   />
                               </PopoverContent>
                           </Popover>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                    variant={"outline"}
-                                    className={cn(
-                                        "w-[140px] justify-start text-left font-normal",
-                                        !load.dropDate && "text-muted-foreground"
-                                    )}
-                                    >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {load.dropDate ? format(load.dropDate, "M/d/yy") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0">
-                                    <Calendar
-                                    mode="single"
-                                    selected={load.dropDate}
-                                    onSelect={(date) => handleFieldChange(load.id, 'dropDate', date)}
-                                    initialFocus
-                                    />
-                                </PopoverContent>
-                            </Popover>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Select onValueChange={(value) => handleFieldChange(load.id, 'driver', value)} defaultValue={load.driver}>
-                              <SelectTrigger className='w-[150px]'>
-                                  <SelectValue placeholder="Select driver" >{getDriverName(load.driver)}</SelectValue>
-                              </SelectTrigger>
-                              <SelectContent>
-                                  {allDrivers.map(driver => (
-                                  <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
-                                  ))}
-                              </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell className="text-center">
-                           <Select onValueChange={(value) => handleFieldChange(load.id, 'truck', value)} defaultValue={load.truck}>
-                              <SelectTrigger className='w-[120px]'>
-                                  <SelectValue placeholder="Select truck">{getTruckName(load.truck)}</SelectValue>
-                              </SelectTrigger>
-                              <SelectContent>
-                                  {allTrucks.map(truck => (
-                                  <SelectItem key={truck.id} value={truck.id}>{truck.name}</SelectItem>
-                                  ))}
-                              </SelectContent>
-                          </Select>
-                        </TableCell>
-                        <TableCell className="text-center">{load.miles}</TableCell>
-                        <TableCell className="text-center">{load.hours}</TableCell>
-                        <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
-                        <TableCell className="text-center">${load.rate}</TableCell>
-                        <TableCell className="text-center">${load.estProfit}</TableCell>
-                        <TableCell className="text-center">
-                          <Badge variant={getStatusVariant(load.status)}>
-                            {load.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                aria-haspopup="true"
-                                size="icon"
-                                variant="ghost"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Toggle menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Assign Driver/Truck</DropdownMenuItem>
-                              <DropdownMenuItem>Update Status</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Select onValueChange={(value) => handleFieldChange(load.id, 'driver', value)} defaultValue={load.driver}>
+                            <SelectTrigger className='w-[150px]'>
+                                <SelectValue placeholder="Select driver" >{getDriverName(load.driver)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {allDrivers.map(driver => (
+                                <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center">
+                         <Select onValueChange={(value) => handleFieldChange(load.id, 'truck', value)} defaultValue={load.truck}>
+                            <SelectTrigger className='w-[120px]'>
+                                <SelectValue placeholder="Select truck">{getTruckName(load.truck)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {allTrucks.map(truck => (
+                                <SelectItem key={truck.id} value={truck.id}>{truck.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center">{load.miles}</TableCell>
+                      <TableCell className="text-center">{load.hours}</TableCell>
+                      <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
+                      <TableCell className="text-center">${load.rate}</TableCell>
+                      <TableCell className="text-center">${load.estProfit}</TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant={getStatusVariant(load.status)}>
+                          {load.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-haspopup="true"
+                              size="icon"
+                              variant="ghost"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Toggle menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuItem>View Details</DropdownMenuItem>
+                            <DropdownMenuItem>Assign Driver/Truck</DropdownMenuItem>
+                            <DropdownMenuItem>Update Status</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
           </TabsContent>
           <TabsContent value="calendar">
             <div className="flex items-center justify-center p-8">
