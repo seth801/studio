@@ -32,6 +32,7 @@ import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '../ui/sidebar';
 import { DriversPage } from './drivers-page';
 import { LoadCalculatorPage } from './load-calculator-page';
+import { Logo } from '../icons/logo';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('loads');
@@ -255,7 +256,7 @@ export function DeliveryOpsDashboard() {
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-[60px] items-center border-b px-6">
               <a href="/" className="flex items-center gap-2 font-semibold">
-                <Truck className="h-6 w-6 text-primary" />
+                <Logo className="h-6 w-auto text-primary" />
                 <span className="group-data-[collapsible=icon]:hidden">Ideal Delivery Ops</span>
               </a>
             </div>
@@ -276,7 +277,7 @@ export function DeliveryOpsDashboard() {
               <SheetContent side="left" className="sm:max-w-xs">
                 <div className="flex h-[60px] items-center border-b px-6">
                   <a href="/" className="flex items-center gap-2 font-semibold">
-                    <Truck className="h-6 w-6 text-primary" />
+                    <Logo className="h-6 w-auto text-primary" />
                     <span className="">Ideal Delivery Ops</span>
                   </a>
                 </div>
@@ -300,7 +301,7 @@ export function DeliveryOpsDashboard() {
             </div>
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant="outline">
+                <Button>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Add Load
                 </Button>
