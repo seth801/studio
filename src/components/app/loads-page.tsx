@@ -160,7 +160,7 @@ export function LoadsPage() {
             <TabsTrigger value="board">Board</TabsTrigger>
             <TabsTrigger value="availability">Availability</TabsTrigger>
           </TabsList>
-          <TabsContent value="table">
+          <TabsContent value="table" className="w-full overflow-auto">
             <Table>
                 <TableHeader>
                   <TableRow>
@@ -317,6 +317,8 @@ export function LoadsPage() {
     </Card>
   );
 }
+
+    
 
     
 
