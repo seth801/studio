@@ -36,6 +36,14 @@ export function DeliveryOpsDashboard() {
     { id: 'RUN-005', truckId: 'TRUCK-E', status: 'Completed', driver: 'Chris Lee', startTime: '07:45 AM' },
   ];
 
+  const formatDriverName = (name: string) => {
+    const parts = name.split(' ');
+    if (parts.length > 1) {
+      return `${parts[0]} ${parts[parts.length - 1].charAt(0)}.`;
+    }
+    return name;
+  };
+
   const renderContent = () => {
     switch(activeView) {
       case 'runs':
@@ -107,9 +115,9 @@ export function DeliveryOpsDashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Run ID</TableHead>
+                    <TableHead>First name Last Initial</TableHead>
                     <TableHead>Truck Number</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Driver</TableHead>
                     <TableHead>Start Time</TableHead>
                     <TableHead>
                       <span className="sr-only">Actions</span>
@@ -120,13 +128,13 @@ export function DeliveryOpsDashboard() {
                   {runs.map((run) => (
                     <TableRow key={run.id}>
                       <TableCell className="font-medium">{run.id}</TableCell>
+                      <TableCell>{formatDriverName(run.driver)}</TableCell>
                       <TableCell>{run.truckId}</TableCell>
                       <TableCell>
                         <Badge variant={run.status === 'Completed' ? 'secondary' : 'default'}>
                           {run.status}
                         </Badge>
                       </TableCell>
-                      <TableCell>{run.driver}</TableCell>
                       <TableCell>{run.startTime}</TableCell>
                       <TableCell>
                         <DropdownMenu>
