@@ -26,6 +26,16 @@ export function AddLoadForm() {
   const [truck, setTruck] = useState('');
   const [driver, setDriver] = useState('');
 
+  const [pickupLocation, setPickupLocation] = useState('');
+  const [pickupDate, setPickupDate] = useState('');
+  const [pickupTime, setPickupTime] = useState('');
+  const [deliveryLocation, setDeliveryLocation] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [deliveryTime, setDeliveryTime] = useState('');
+  const [commodity, setCommodity] = useState('');
+  const [weight, setWeight] = useState('');
+  const [rate, setRate] = useState('');
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +65,15 @@ export function AddLoadForm() {
 
         setBroker(result.broker);
         setLoadNumber(result.loadNumber);
+        setPickupLocation(result.pickupLocation);
+        setPickupDate(result.pickupDate);
+        setPickupTime(result.pickupTime);
+        setDeliveryLocation(result.deliveryLocation);
+        setDeliveryDate(result.deliveryDate);
+        setDeliveryTime(result.deliveryTime);
+        setCommodity(result.commodity);
+        setWeight(result.weight.toString());
+        setRate(result.rate.toString());
         
         toast({
           title: 'Analysis Complete',
@@ -85,7 +104,7 @@ export function AddLoadForm() {
 
 
   return (
-    <DialogContent className="sm:max-w-[625px]">
+    <DialogContent className="sm:max-w-[725px]">
       <DialogHeader>
         <DialogTitle>Add New Load</DialogTitle>
         <DialogDescription>
@@ -122,30 +141,64 @@ export function AddLoadForm() {
           </div>
         </TabsContent>
         <TabsContent value="manual">
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="broker" className="text-right">
-                Broker
-              </Label>
-              <Input id="broker" value={broker} onChange={(e) => setBroker(e.target.value)} placeholder="e.g., CH Robinson" className="col-span-3" />
+          <div className="grid grid-cols-2 gap-x-8 gap-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="broker">Broker</Label>
+              <Input id="broker" value={broker} onChange={(e) => setBroker(e.target.value)} placeholder="e.g., CH Robinson" />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="load-number" className="text-right">
-                Load Number
-              </Label>
-              <Input id="load-number" value={loadNumber} onChange={(e) => setLoadNumber(e.target.value)} placeholder="e.g., LD-123456" className="col-span-3" />
+            <div className="space-y-2">
+              <Label htmlFor="load-number">Load Number</Label>
+              <Input id="load-number" value={loadNumber} onChange={(e) => setLoadNumber(e.target.value)} placeholder="e.g., LD-123456" />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="truck" className="text-right">
-                Assign Truck
-              </Label>
-              <Input id="truck" value={truck} onChange={(e) => setTruck(e.target.value)} placeholder="e.g., TRUCK-A" className="col-span-3" />
+            <div className="space-y-2">
+              <Label htmlFor="pickup-location">Pickup Location</Label>
+              <Input id="pickup-location" value={pickupLocation} onChange={(e) => setPickupLocation(e.target.value)} placeholder="e.g., West Valley City, UT" />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="driver" className="text-right">
-                Assign Driver
-              </Label>
-              <Input id="driver" value={driver} onChange={(e) => setDriver(e.target.value)} placeholder="e.g., John Doe" className="col-span-3" />
+            <div className="grid grid-cols-2 gap-x-4">
+                <div className='space-y-2'>
+                    <Label htmlFor="pickup-date">Pickup Date</Label>
+                    <Input id="pickup-date" value={pickupDate} onChange={(e) => setPickupDate(e.target.value)} placeholder="e.g., 12/29/2025" />
+                </div>
+                <div className='space-y-2'>
+                    <Label htmlFor="pickup-time">Pickup Time</Label>
+                    <Input id="pickup-time" value={pickupTime} onChange={(e) => setPickupTime(e.target.value)} placeholder="e.g., 08:00-14:00" />
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="delivery-location">Delivery Location</Label>
+              <Input id="delivery-location" value={deliveryLocation} onChange={(e) => setDeliveryLocation(e.target.value)} placeholder="e.g., Boise, ID" />
+            </div>
+             <div className="grid grid-cols-2 gap-x-4">
+                <div className='space-y-2'>
+                    <Label htmlFor="delivery-date">Delivery Date</Label>
+                    <Input id="delivery-date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} placeholder="e.g., 12/30/2025" />
+                </div>
+                <div className='space-y-2'>
+                    <Label htmlFor="delivery-time">Delivery Time</Label>
+                    <Input id="delivery-time" value={deliveryTime} onChange={(e) => setDeliveryTime(e.target.value)} placeholder="e.g., 08:00" />
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="commodity">Commodity</Label>
+              <Input id="commodity" value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="e.g., Dry Goods" />
+            </div>
+             <div className="grid grid-cols-2 gap-x-4">
+                <div className='space-y-2'>
+                    <Label htmlFor="weight">Weight (lbs)</Label>
+                    <Input id="weight" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="e.g., 31200" />
+                </div>
+                <div className='space-y-2'>
+                    <Label htmlFor="rate">Rate ($)</Label>
+                    <Input id="rate" value={rate} onChange={(e) => setRate(e.target.value)} placeholder="e.g., 800" />
+                </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="truck">Assign Truck</Label>
+              <Input id="truck" value={truck} onChange={(e) => setTruck(e.target.value)} placeholder="e.g., TRUCK-A" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="driver">Assign Driver</Label>
+              <Input id="driver" value={driver} onChange={(e) => setDriver(e.target.value)} placeholder="e.g., John Doe" />
             </div>
           </div>
           <div className="flex justify-end">

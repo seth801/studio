@@ -23,6 +23,15 @@ export type ExtractRateConInput = z.infer<typeof ExtractRateConInputSchema>;
 const ExtractRateConOutputSchema = z.object({
   broker: z.string().describe('The name of the broker or company.'),
   loadNumber: z.string().describe('The unique identifier for the load.'),
+  pickupLocation: z.string().describe('The pickup location address.'),
+  pickupDate: z.string().describe('The pickup date.'),
+  pickupTime: z.string().describe('The pickup time or window.'),
+  deliveryLocation: z.string().describe('The delivery location address.'),
+  deliveryDate: z.string().describe('The delivery date.'),
+  deliveryTime: z.string().describe('The delivery time or window.'),
+  commodity: z.string().describe('The type of commodity being shipped.'),
+  weight: z.number().describe('The weight of the load in pounds (lbs).'),
+  rate: z.number().describe('The flat rate for the load in dollars.'),
 });
 export type ExtractRateConOutput = z.infer<typeof ExtractRateConOutputSchema>;
 
@@ -41,6 +50,15 @@ const prompt = ai.definePrompt({
   Please extract the following information:
   - Broker Name
   - Load Number
+  - Pickup Location (City, State)
+  - Pickup Date (MM/DD/YY)
+  - Pickup Time window
+  - Delivery Location (City, State)
+  - Delivery Date (MM/DD/YY)
+  - Delivery Time
+  - Commodity
+  - Weight (in lbs)
+  - Rate (in dollars)
   
   Provide the extracted information in the specified JSON format.`,
 });
