@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle, PanelLeft } from 'lucide-react';
+import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle, PanelLeft, Calculator } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,7 @@ import { LoadsPage } from './loads-page';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '../ui/sidebar';
 import { DriversPage } from './drivers-page';
+import { LoadCalculatorPage } from './load-calculator-page';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('loads');
@@ -80,6 +81,13 @@ export function DeliveryOpsDashboard() {
       >
         <UserCircle className="h-4 w-4" />
         <span className='group-data-[collapsible=icon]:hidden'>Drivers</span>
+      </button>
+      <button
+        onClick={() => setActiveView('calculator')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'calculator' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <Calculator className="h-4 w-4" />
+        <span className='group-data-[collapsible=icon]:hidden'>Load Calculator</span>
       </button>
       <button
         onClick={() => setActiveView('status')}
@@ -231,6 +239,8 @@ export function DeliveryOpsDashboard() {
         return <TrucksPage />;
       case 'drivers':
         return <DriversPage />;
+      case 'calculator':
+        return <LoadCalculatorPage />;
       case 'billing':
         return <BillingPage />;
       default:

@@ -46,15 +46,16 @@ type Load = {
   hours: number;
   perMileRate: number;
   rate: number;
+  estProfit: number;
   status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending';
 };
 
 const initialLoadsData: Load[] = [
-    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, status: 'Booked' },
-    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, status: 'In-transit' },
-    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, status: 'Delivered' },
-    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date('2025-12-30'), dropDate: new Date('2026-01-01'), driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, status: 'Booked' },
-    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, status: 'Delivered' },
+    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, estProfit: 250, status: 'Booked' },
+    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, estProfit: 400, status: 'In-transit' },
+    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, estProfit: 200, status: 'Delivered' },
+    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date('2025-12-30'), dropDate: new Date('2026-01-01'), driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, estProfit: 500, status: 'Booked' },
+    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, estProfit: 225, status: 'Delivered' },
 ];
 
 const allDrivers = [
@@ -175,6 +176,7 @@ export function LoadsPage() {
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('hours')}>Hours {getSortIndicator('hours')}</Button></TableHead>
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('perMileRate')}>$/Mile {getSortIndicator('perMileRate')}</Button></TableHead>
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('estProfit')}>Est Profit {getSortIndicator('estProfit')}</Button></TableHead>
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
                     <TableHead>
                       <span className="sr-only">Actions</span>
@@ -264,6 +266,7 @@ export function LoadsPage() {
                       <TableCell className="text-center">{load.hours}</TableCell>
                       <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
                       <TableCell className="text-center">${load.rate}</TableCell>
+                      <TableCell className="text-center">${load.estProfit}</TableCell>
                       <TableCell className="text-center">
                         <Badge variant={getStatusVariant(load.status)}>
                           {load.status}
