@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle } from 'lucide-react';
+import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle, PanelLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -28,6 +28,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import { Dialog, DialogTrigger } from '../ui/dialog';
 import { AddLoadForm } from './add-load-form';
 import { LoadsPage } from './loads-page';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '../ui/sidebar';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -47,6 +49,54 @@ export function DeliveryOpsDashboard() {
     }
     return name;
   };
+
+  const NavContent = () => (
+    <nav className="grid items-start px-4 text-sm font-medium">
+      <button
+        onClick={() => setActiveView('runs')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'runs' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <MapPin className="h-4 w-4" />
+        Active Runs
+      </button>
+      <button
+        onClick={() => setActiveView('loads')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <Package className="h-4 w-4" />
+        Loads
+      </button>
+      <button
+        onClick={() => setActiveView('trucks')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <Truck className="h-4 w-4" />
+        Trucks
+      </button>
+      <button
+        onClick={() => setActiveView('drivers')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'drivers' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <UserCircle className="h-4 w-4" />
+        Drivers
+      </button>
+      <button
+        onClick={() => setActiveView('status')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'status' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <Activity className="h-4 w-4" />
+        System Status
+      </button>
+      <button
+        onClick={() => setActiveView('billing')}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'billing' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <CreditCard className="h-4 w-4" />
+        Billing
+      </button>
+    </nav>
+  );
+
 
   const renderContent = () => {
     switch(activeView) {
@@ -186,113 +236,90 @@ export function DeliveryOpsDashboard() {
   }
 
   return (
-    <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-card lg:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
-          <div className="flex h-[60px] items-center border-b px-6">
-            <a href="/" className="flex items-center gap-2 font-semibold">
-              <Truck className="h-6 w-6 text-primary" />
-              <span className="">Ideal Delivery Ops</span>
-            </a>
+    <SidebarProvider>
+      <div className="grid min-h-screen w-full lg:grid-cols-[auto_1fr]">
+        <Sidebar collapsible="icon" className="hidden border-r bg-card lg:block">
+          <div className="flex h-full max-h-screen flex-col gap-2">
+            <div className="flex h-[60px] items-center border-b px-6">
+              <a href="/" className="flex items-center gap-2 font-semibold">
+                <Truck className="h-6 w-6 text-primary" />
+                <span className="">Ideal Delivery Ops</span>
+              </a>
+            </div>
+            <div className="flex-1 overflow-auto py-2">
+              <NavContent />
+            </div>
           </div>
-          <div className="flex-1 overflow-auto py-2">
-            <nav className="grid items-start px-4 text-sm font-medium">
-              <button
-                onClick={() => setActiveView('runs')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'runs' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <MapPin className="h-4 w-4" />
-                Active Runs
-              </button>
-              <button
-                onClick={() => setActiveView('loads')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <Package className="h-4 w-4" />
-                Loads
-              </button>
-              <button
-                onClick={() => setActiveView('trucks')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <Truck className="h-4 w-4" />
-                Trucks
-              </button>
-              <button
-                onClick={() => setActiveView('drivers')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'drivers' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <UserCircle className="h-4 w-4" />
-                Drivers
-              </button>
-              <button
-                onClick={() => setActiveView('status')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'status' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <Activity className="h-4 w-4" />
-                System Status
-              </button>
-              <button
-                onClick={() => setActiveView('billing')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'billing' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <CreditCard className="h-4 w-4" />
-                Billing
-              </button>
-            </nav>
-          </div>
+        </Sidebar>
+        <div className="flex flex-col">
+          <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-card px-6">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="lg:hidden">
+                  <PanelLeft className="h-5 w-5" />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="sm:max-w-xs">
+                <div className="flex h-[60px] items-center border-b px-6">
+                  <a href="/" className="flex items-center gap-2 font-semibold">
+                    <Truck className="h-6 w-6 text-primary" />
+                    <span className="">Ideal Delivery Ops</span>
+                  </a>
+                </div>
+                <div className="flex-1 overflow-auto py-2">
+                  <NavContent />
+                </div>
+              </SheetContent>
+            </Sheet>
+            <SidebarTrigger className='hidden lg:flex' />
+            <div className="w-full flex-1">
+              <form>
+                <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type="search"
+                    placeholder="Search runs, trucks, drivers..."
+                    className="w-full bg-background shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3"
+                  />
+                </div>
+              </form>
+            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Add Load
+                </Button>
+              </DialogTrigger>
+              <AddLoadForm />
+            </Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full border w-8 h-8"
+                >
+                  <UserCircle className="h-4 w-4" />
+                  <span className="sr-only">Toggle user menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem>Support</DropdownMenuItem>
+                <DropdownMenuItem>Logout</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </header>
+          <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
+            {renderContent()}
+          </main>
         </div>
       </div>
-      <div className="flex flex-col">
-        <header className="flex h-14 lg:h-[60px] items-center gap-4 border-b bg-card px-6">
-          <a href="#" className="lg:hidden">
-            <Truck className="h-6 w-6" />
-            <span className="sr-only">Home</span>
-          </a>
-          <div className="w-full flex-1">
-            <form>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search runs, trucks, drivers..."
-                  className="w-full bg-background shadow-none appearance-none pl-8 md:w-2/3 lg:w-1/3"
-                />
-              </div>
-            </form>
-          </div>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Add Load
-              </Button>
-            </DialogTrigger>
-            <AddLoadForm />
-          </Dialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full border w-8 h-8"
-              >
-                <UserCircle className="h-4 w-4" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
-          {renderContent()}
-        </main>
-      </div>
-    </div>
+    </SidebarProvider>
   );
 }
+
+    
