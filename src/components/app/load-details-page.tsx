@@ -100,46 +100,6 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
       </header>
       <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
         <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
-            <div className='grid gap-4 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4'>
-                <Card>
-                    <CardHeader className="pb-2">
-                        <CardDescription>Broker</CardDescription>
-                        <CardTitle className="text-2xl">{load.brokerName}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-xs text-muted-foreground">Load ID: {load.id}</div>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="pb-2">
-                        <CardDescription>Rate</CardDescription>
-                        <CardTitle className="text-2xl">${load.rate.toLocaleString()}</CardTitle>
-                    </CardHeader>
-                     <CardContent>
-                        <div className="text-xs text-muted-foreground">${load.perMileRate.toFixed(2)} / mile</div>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="pb-2">
-                        <CardDescription>Est. Profit</CardDescription>
-                        <CardTitle className="text-2xl text-green-400">${load.estProfit.toLocaleString()}</CardTitle>
-                    </CardHeader>
-                     <CardContent>
-                        <div className="text-xs text-muted-foreground">After estimated expenses</div>
-                    </CardContent>
-                </Card>
-                 <Card>
-                    <CardHeader className="pb-2">
-                        <CardDescription>Status</CardDescription>
-                        <CardTitle className="text-2xl">
-                             <Badge variant={getStatusVariant(load.status)} className='text-lg'>{load.status}</Badge>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-xs text-muted-foreground">Updated 2 hours ago</div>
-                    </CardContent>
-                </Card>
-            </div>
             
             <Card className='h-[60vh]'>
                 <GoogleMapEmbed stops={stops} />
@@ -173,6 +133,46 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
         </div>
 
         <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-1">
+             <div className='grid gap-4 sm:grid-cols-2'>
+                <Card>
+                    <CardHeader className="pb-2">
+                        <CardDescription>Broker</CardDescription>
+                        <CardTitle className="text-xl">{load.brokerName}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-xs text-muted-foreground">Load ID: {load.id}</div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader className="pb-2">
+                        <CardDescription>Status</CardDescription>
+                        <CardTitle className="text-xl">
+                             <Badge variant={getStatusVariant(load.status)} className='text-md'>{load.status}</Badge>
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-xs text-muted-foreground">Updated 2 hours ago</div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader className="pb-2">
+                        <CardDescription>Rate</CardDescription>
+                        <CardTitle className="text-xl">${load.rate.toLocaleString()}</CardTitle>
+                    </CardHeader>
+                     <CardContent>
+                        <div className="text-xs text-muted-foreground">${load.perMileRate.toFixed(2)} / mile</div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader className="pb-2">
+                        <CardDescription>Est. Profit</CardDescription>
+                        <CardTitle className="text-xl text-green-400">${load.estProfit.toLocaleString()}</CardTitle>
+                    </CardHeader>
+                     <CardContent>
+                        <div className="text-xs text-muted-foreground">After estimated expenses</div>
+                    </CardContent>
+                </Card>
+            </div>
             <Card>
                 <CardHeader>
                     <CardTitle>Trip Details</CardTitle>
@@ -220,5 +220,3 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
     </div>
   );
 }
-
-    
