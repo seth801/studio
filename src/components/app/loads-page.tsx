@@ -13,17 +13,33 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { MoreHorizontal, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react';
+import { MoreHorizontal, ArrowUp, ArrowDown, ArrowUpDown, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
+
 
 type Load = {
   id: string;
   brokerName: string;
   origin: string;
   destination: string;
-  pickupDate: string;
-  dropDate: string;
+  pickupDate: Date;
+  dropDate: Date;
   driver: string;
   truck: string;
   miles: number;
@@ -33,19 +49,37 @@ type Load = {
   status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending';
 };
 
-const loadsData: Load[] = [
-    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: '2025-12-29', dropDate: '2025-12-30', driver: 'John Doe', truck: 'TRUCK-A', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, status: 'Booked' },
-    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: '2025-12-28', dropDate: '2025-12-29', driver: 'Jane Smith', truck: 'TRUCK-B', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, status: 'In-transit' },
-    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: '2025-12-27', dropDate: '2025-12-27', driver: 'Mike Johnson', truck: 'TRUCK-C', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, status: 'Delivered' },
-    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: '2025-12-30', dropDate: '2026-01-01', driver: 'Emily Davis', truck: 'TRUCK-D', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, status: 'Booked' },
-    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: '2025-12-26', dropDate: '2025-12-27', driver: 'Chris Lee', truck: 'TRUCK-E', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, status: 'Delivered' },
+const initialLoadsData: Load[] = [
+    { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date('2025-12-29'), dropDate: new Date('2025-12-30'), driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, status: 'Booked' },
+    { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date('2025-12-28'), dropDate: new Date('2025-12-29'), driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, status: 'In-transit' },
+    { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date('2025-12-27'), dropDate: new Date('2025-12-27'), driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, status: 'Delivered' },
+    { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date('2025-12-30'), dropDate: new Date('2026-01-01'), driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, status: 'Booked' },
+    { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date('2025-12-26'), dropDate: new Date('2025-12-27'), driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, status: 'Delivered' },
 ];
 
+const allDrivers = [
+  { id: 'driver-007', name: 'John Doe' },
+  { id: 'driver-009', name: 'Emily Davis' },
+  { id: 'driver-001', name: 'Jane Smith' },
+  { id: 'driver-002', name: 'Mike Johnson' },
+  { id: 'driver-003', name: 'Chris Lee' },
+];
+
+const allTrucks = [
+  { id: 'truck-a', name: 'TRUCK-A' },
+  { id: 'truck-b', name: 'TRUCK-B' },
+  { id: 'truck-c', name: 'TRUCK-C' },
+  { id: 'truck-d', name: 'TRUCK-D' },
+  { id: 'truck-e', name: 'TRUCK-E' },
+];
+
+
 export function LoadsPage() {
+  const [loads, setLoads] = useState<Load[]>(initialLoadsData);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Load; direction: 'ascending' | 'descending' } | null>(null);
   
   const sortedLoads = useMemo(() => {
-    let sortableItems = [...loadsData];
+    let sortableItems = [...loads];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
         const aValue = a[sortConfig.key];
@@ -60,7 +94,7 @@ export function LoadsPage() {
       });
     }
     return sortableItems;
-  }, [sortConfig]);
+  }, [loads, sortConfig]);
 
   const requestSort = (key: keyof Load) => {
     let direction: 'ascending' | 'descending' = 'ascending';
@@ -93,6 +127,22 @@ export function LoadsPage() {
     }
   }
 
+  const handleFieldChange = (loadId: string, field: keyof Load, value: any) => {
+    setLoads(prevLoads => 
+      prevLoads.map(load => 
+        load.id === loadId ? { ...load, [field]: value } : load
+      )
+    );
+  };
+  
+  const getDriverName = (driverId: string) => {
+    return allDrivers.find(d => d.id === driverId)?.name || 'Unassigned';
+  }
+
+  const getTruckName = (truckId: string) => {
+    return allTrucks.find(t => t.id === truckId)?.name || 'Unassigned';
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -117,15 +167,15 @@ export function LoadsPage() {
                     <TableHead><Button variant="ghost" onClick={() => requestSort('brokerName')}>Broker {getSortIndicator('brokerName')}</Button></TableHead>
                     <TableHead><Button variant="ghost" onClick={() => requestSort('origin')}>Origin {getSortIndicator('origin')}</Button></TableHead>
                     <TableHead><Button variant="ghost" onClick={() => requestSort('destination')}>Destination {getSortIndicator('destination')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('pickupDate')}>Pickup Date {getSortIndicator('pickupDate')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('dropDate')}>Drop Date {getSortIndicator('dropDate')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('driver')}>Driver {getSortIndicator('driver')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('truck')}>Truck {getSortIndicator('truck')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('miles')}>Miles {getSortIndicator('miles')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('hours')}>Hours {getSortIndicator('hours')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('perMileRate')}>$/Mile {getSortIndicator('perMileRate')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
-                    <TableHead><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('pickupDate')}>Pickup Date {getSortIndicator('pickupDate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('dropDate')}>Drop Date {getSortIndicator('dropDate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('driver')}>Driver {getSortIndicator('driver')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('truck')}>Truck {getSortIndicator('truck')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('miles')}>Miles {getSortIndicator('miles')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('hours')}>Hours {getSortIndicator('hours')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('perMileRate')}>$/Mile {getSortIndicator('perMileRate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
+                    <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
                     <TableHead>
                       <span className="sr-only">Actions</span>
                     </TableHead>
@@ -138,15 +188,83 @@ export function LoadsPage() {
                       <TableCell>{load.brokerName}</TableCell>
                       <TableCell>{load.origin}</TableCell>
                       <TableCell>{load.destination}</TableCell>
-                      <TableCell>{load.pickupDate}</TableCell>
-                      <TableCell>{load.dropDate}</TableCell>
-                      <TableCell>{load.driver}</TableCell>
-                      <TableCell>{load.truck}</TableCell>
-                      <TableCell>{load.miles}</TableCell>
-                      <TableCell>{load.hours}</TableCell>
-                      <TableCell>${load.perMileRate.toFixed(2)}</TableCell>
-                      <TableCell>${load.rate}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-[140px] justify-start text-left font-normal",
+                                    !load.pickupDate && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {load.pickupDate ? format(load.pickupDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={load.pickupDate}
+                                onSelect={(date) => handleFieldChange(load.id, 'pickupDate', date)}
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Popover>
+                              <PopoverTrigger asChild>
+                                  <Button
+                                  variant={"outline"}
+                                  className={cn(
+                                      "w-[140px] justify-start text-left font-normal",
+                                      !load.dropDate && "text-muted-foreground"
+                                  )}
+                                  >
+                                  <CalendarIcon className="mr-2 h-4 w-4" />
+                                  {load.dropDate ? format(load.dropDate, "PPP") : <span>Pick a date</span>}
+                                  </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-auto p-0">
+                                  <Calendar
+                                  mode="single"
+                                  selected={load.dropDate}
+                                  onSelect={(date) => handleFieldChange(load.id, 'dropDate', date)}
+                                  initialFocus
+                                  />
+                              </PopoverContent>
+                          </Popover>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Select onValueChange={(value) => handleFieldChange(load.id, 'driver', value)} defaultValue={load.driver}>
+                            <SelectTrigger className='w-[150px]'>
+                                <SelectValue placeholder="Select driver" >{getDriverName(load.driver)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {allDrivers.map(driver => (
+                                <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center">
+                         <Select onValueChange={(value) => handleFieldChange(load.id, 'truck', value)} defaultValue={load.truck}>
+                            <SelectTrigger className='w-[120px]'>
+                                <SelectValue placeholder="Select truck">{getTruckName(load.truck)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                {allTrucks.map(truck => (
+                                <SelectItem key={truck.id} value={truck.id}>{truck.name}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                      </TableCell>
+                      <TableCell className="text-center">{load.miles}</TableCell>
+                      <TableCell className="text-center">{load.hours}</TableCell>
+                      <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
+                      <TableCell className="text-center">${load.rate}</TableCell>
+                      <TableCell className="text-center">
                         <Badge variant={getStatusVariant(load.status)}>
                           {load.status}
                         </Badge>

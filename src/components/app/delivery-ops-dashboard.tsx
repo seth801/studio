@@ -30,6 +30,7 @@ import { AddLoadForm } from './add-load-form';
 import { LoadsPage } from './loads-page';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '../ui/sidebar';
+import { DriversPage } from './drivers-page';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -57,42 +58,42 @@ export function DeliveryOpsDashboard() {
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'runs' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <MapPin className="h-4 w-4" />
-        Active Runs
+        <span className='group-data-[collapsible=icon]:hidden'>Active Runs</span>
       </button>
       <button
         onClick={() => setActiveView('loads')}
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <Package className="h-4 w-4" />
-        Loads
+        <span className='group-data-[collapsible=icon]:hidden'>Loads</span>
       </button>
       <button
         onClick={() => setActiveView('trucks')}
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <Truck className="h-4 w-4" />
-        Trucks
+        <span className='group-data-[collapsible=icon]:hidden'>Trucks</span>
       </button>
       <button
         onClick={() => setActiveView('drivers')}
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'drivers' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <UserCircle className="h-4 w-4" />
-        Drivers
+        <span className='group-data-[collapsible=icon]:hidden'>Drivers</span>
       </button>
       <button
         onClick={() => setActiveView('status')}
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'status' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <Activity className="h-4 w-4" />
-        System Status
+        <span className='group-data-[collapsible=icon]:hidden'>System Status</span>
       </button>
       <button
         onClick={() => setActiveView('billing')}
         className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'billing' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
         <CreditCard className="h-4 w-4" />
-        Billing
+        <span className='group-data-[collapsible=icon]:hidden'>Billing</span>
       </button>
     </nav>
   );
@@ -228,6 +229,8 @@ export function DeliveryOpsDashboard() {
         return <LoadsPage />;
       case 'trucks':
         return <TrucksPage />;
+      case 'drivers':
+        return <DriversPage />;
       case 'billing':
         return <BillingPage />;
       default:
