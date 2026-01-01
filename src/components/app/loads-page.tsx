@@ -41,7 +41,7 @@ export function LoadsPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Loads</CardTitle>
+        <CardTitle>Dispatch</CardTitle>
         <CardDescription>
           Manage all your loads from here. View by table, calendar, or availability.
         </CardDescription>
@@ -49,9 +49,10 @@ export function LoadsPage() {
       <CardContent>
         <Tabs defaultValue="table">
           <TabsList>
-            <TabsTrigger value="table">Table View</TabsTrigger>
-            <TabsTrigger value="calendar">Calendar View</TabsTrigger>
-            <TabsTrigger value="availability">Availability View</TabsTrigger>
+            <TabsTrigger value="table">Table</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
+            <TabsTrigger value="board">Board</TabsTrigger>
+            <TabsTrigger value="availability">Availability</TabsTrigger>
           </TabsList>
           <TabsContent value="table">
             <Table>
@@ -109,6 +110,11 @@ export function LoadsPage() {
           <TabsContent value="calendar">
             <div className="flex items-center justify-center p-8">
               <p className="text-muted-foreground">Calendar view coming soon.</p>
+            </div>
+          </TabsContent>
+           <TabsContent value="board">
+            <div className="flex items-center justify-center p-8">
+              <p className="text-muted-foreground">Board view coming soon.</p>
             </div>
           </TabsContent>
           <TabsContent value="availability">
