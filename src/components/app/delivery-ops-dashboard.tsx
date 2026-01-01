@@ -29,7 +29,7 @@ import { Dialog, DialogTrigger } from '../ui/dialog';
 import { AddLoadForm } from './add-load-form';
 import { LoadsPage } from './loads-page';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarInset, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '../ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarTrigger } from '../ui/sidebar';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -243,7 +243,7 @@ export function DeliveryOpsDashboard() {
             <div className="flex h-[60px] items-center border-b px-6">
               <a href="/" className="flex items-center gap-2 font-semibold">
                 <Truck className="h-6 w-6 text-primary" />
-                <span className="">Ideal Delivery Ops</span>
+                <span className="group-data-[collapsible=icon]:hidden">Ideal Delivery Ops</span>
               </a>
             </div>
             <div className="flex-1 overflow-auto py-2">
@@ -321,5 +321,3 @@ export function DeliveryOpsDashboard() {
     </SidebarProvider>
   );
 }
-
-    
