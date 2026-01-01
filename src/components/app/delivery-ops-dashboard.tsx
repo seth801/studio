@@ -33,7 +33,7 @@ import { SidebarProvider, Sidebar, SidebarTrigger } from '../ui/sidebar';
 import { DriversPage } from './drivers-page';
 
 export function DeliveryOpsDashboard() {
-  const [activeView, setActiveView] = useState('runs');
+  const [activeView, setActiveView] = useState('loads');
 
   const runs = [
     { id: 'RUN-001', brokerName: 'CH Robinson', loadNumber: 'LD-789012', truckId: 'TRUCK-A', status: 'In Progress', driver: 'John Doe', startTime: '08:00 AM' },
@@ -239,7 +239,7 @@ export function DeliveryOpsDashboard() {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="grid min-h-screen w-full lg:grid-cols-[auto_1fr]">
         <Sidebar collapsible="icon" className="hidden border-r bg-card lg:block">
           <div className="flex h-full max-h-screen flex-col gap-2">

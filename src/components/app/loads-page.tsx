@@ -199,7 +199,7 @@ export function LoadsPage() {
                                 )}
                                 >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {load.pickupDate ? format(load.pickupDate, "PPP") : <span>Pick a date</span>}
+                                {load.pickupDate ? format(load.pickupDate, "M/d/yy") : <span>Pick a date</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -223,7 +223,7 @@ export function LoadsPage() {
                                   )}
                                   >
                                   <CalendarIcon className="mr-2 h-4 w-4" />
-                                  {load.dropDate ? format(load.dropDate, "PPP") : <span>Pick a date</span>}
+                                  {load.dropDate ? format(load.dropDate, "M/d/yy") : <span>Pick a date</span>}
                                   </Button>
                               </PopoverTrigger>
                               <PopoverContent className="w-auto p-0">
