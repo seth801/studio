@@ -24,16 +24,17 @@ import {
 import { Input } from '../ui/input';
 import { BillingPage } from './billing-page';
 import { TrucksPage } from './trucks-page';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
 
   const runs = [
-    { id: 'RUN-001', truckId: 'TRUCK-A', status: 'In Progress', driver: 'John Doe', startTime: '08:00 AM' },
-    { id: 'RUN-002', truckId: 'TRUCK-B', status: 'Completed', driver: 'Jane Smith', startTime: '09:30 AM' },
-    { id: 'RUN-003', truckId: 'TRUCK-C', status: 'Pending', driver: 'Mike Johnson', startTime: '11:00 AM' },
-    { id: 'RUN-004', truckId: 'TRUCK-D', status: 'In Progress', driver: 'Emily Davis', startTime: '10:15 AM' },
-    { id: 'RUN-005', truckId: 'TRUCK-E', status: 'Completed', driver: 'Chris Lee', startTime: '07:45 AM' },
+    { id: 'RUN-001', brokerName: 'CH Robinson', loadNumber: 'LD-789012', truckId: 'TRUCK-A', status: 'In Progress', driver: 'John Doe', startTime: '08:00 AM' },
+    { id: 'RUN-002', brokerName: 'Total Quality', loadNumber: 'LD-345678', truckId: 'TRUCK-B', status: 'Completed', driver: 'Jane Smith', startTime: '09:30 AM' },
+    { id: 'RUN-003', brokerName: 'Coyote', loadNumber: 'LD-901234', truckId: 'TRUCK-C', status: 'Pending', driver: 'Mike Johnson', startTime: '11:00 AM' },
+    { id: 'RUN-004', brokerName: 'Echo Global', loadNumber: 'LD-567890', truckId: 'TRUCK-D', status: 'In Progress', driver: 'Emily Davis', startTime: '10:15 AM' },
+    { id: 'RUN-005', brokerName: 'CH Robinson', loadNumber: 'LD-123456', truckId: 'TRUCK-E', status: 'Completed', driver: 'Chris Lee', startTime: '07:45 AM' },
   ];
 
   const formatDriverName = (name: string) => {
@@ -48,7 +49,7 @@ export function DeliveryOpsDashboard() {
     switch(activeView) {
       case 'runs':
         return (
-          <>
+          <TooltipProvider>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -114,7 +115,7 @@ export function DeliveryOpsDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Job #</TableHead>
+                    <TableHead>Broker</TableHead>
                     <TableHead>Driver</TableHead>
                     <TableHead>Truck</TableHead>
                     <TableHead>Status</TableHead>
@@ -127,7 +128,14 @@ export function DeliveryOpsDashboard() {
                 <TableBody>
                   {runs.map((run) => (
                     <TableRow key={run.id}>
-                      <TableCell className="font-medium">{run.id}</TableCell>
+                      <TableCell className="font-medium">
+                        <Tooltip>
+                          <TooltipTrigger><span>{run.brokerName}</span></TooltipTrigger>
+                          <TooltipContent>
+                            <p>{run.loadNumber}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TableCell>
                       <TableCell>{formatDriverName(run.driver)}</TableCell>
                       <TableCell>{run.truckId}</TableCell>
                       <TableCell>
@@ -161,7 +169,7 @@ export function DeliveryOpsDashboard() {
               </Table>
             </CardContent>
           </Card>
-          </>
+          </TooltipProvider>
         );
       case 'trucks':
         return <TrucksPage />;
