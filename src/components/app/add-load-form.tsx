@@ -197,7 +197,7 @@ export function AddLoadForm() {
                 {stops.map((stop, index) => (
                   <div key={index} className="space-y-4 rounded-md border p-4">
                       <div className="flex justify-between items-center">
-                          <Label className="capitalize font-semibold">{stop.type} #{stops.filter(s => s.type === stop.type).map(s => s.location).indexOf(stop.location) + 1}</Label>
+                          <Label className="capitalize font-semibold">{stop.type} #{stops.filter(s => s.type === stop.type).map((s, i) => i).indexOf(index) + 1}</Label>
                           {stops.length > 2 && <Button variant="ghost" size="icon" onClick={() => removeStop(index)}><Trash2 className="h-4 w-4 text-destructive"/></Button>}
                       </div>
                       <div className="space-y-2">
