@@ -27,6 +27,7 @@ import { TrucksPage } from './trucks-page';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import { Dialog, DialogTrigger } from '../ui/dialog';
 import { AddLoadForm } from './add-load-form';
+import { LoadsPage } from './loads-page';
 
 export function DeliveryOpsDashboard() {
   const [activeView, setActiveView] = useState('runs');
@@ -173,6 +174,8 @@ export function DeliveryOpsDashboard() {
           </Card>
           </TooltipProvider>
         );
+      case 'loads':
+        return <LoadsPage />;
       case 'trucks':
         return <TrucksPage />;
       case 'billing':
@@ -202,18 +205,18 @@ export function DeliveryOpsDashboard() {
                 Active Runs
               </button>
               <button
+                onClick={() => setActiveView('loads')}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+              >
+                <Package className="h-4 w-4" />
+                Loads
+              </button>
+              <button
                 onClick={() => setActiveView('trucks')}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
               >
                 <Truck className="h-4 w-4" />
                 Trucks
-              </button>
-              <button
-                onClick={() => setActiveView('deliveries')}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'deliveries' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
-              >
-                <Package className="h-4 w-4" />
-                Deliveries
               </button>
               <button
                 onClick={() => setActiveView('drivers')}
