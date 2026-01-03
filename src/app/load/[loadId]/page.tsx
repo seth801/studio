@@ -1,8 +1,9 @@
 
-import { LoadDetailsPage } from '@/components/app/load-details-page';
+import { LoadDetailsPage } from '@/components/admin/dashboard/load-details-page';
 
-export default async function LoadPage({ params }: { params: { loadId: string } }) {
+export default async function LoadPage({ params }: { params: Promise<{ loadId: string }> }) {
+  const { loadId } = await params;
   return (
-    <LoadDetailsPage loadId={params.loadId} />
+    <LoadDetailsPage loadId={loadId} />
   );
 }

@@ -1,0 +1,9 @@
+{
+  "/(admin)/admin/page": "/admin",
+  "/(driver)/driver/page": "/driver",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/favicon.ico/route": "/favicon.ico",
+  "/load/[loadId]/page": "/load/[loadId]",
+  "/page": "/"
+}

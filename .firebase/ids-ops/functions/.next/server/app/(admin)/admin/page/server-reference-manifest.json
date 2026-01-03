@@ -1,0 +1,20 @@
+{
+  "node": {
+    "4095271e54632bd3d82c7b30beacf3abcc854564a4": {
+      "workers": {
+        "app/(admin)/admin/page": {
+          "moduleId": 60726,
+          "async": true,
+          "exportedName": "extractRateCon",
+          "filename": "src/ai/flows/extract-rate-con-flow.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/admin/page": "action-browser"
+      },
+      "exportedName": "extractRateCon",
+      "filename": "src/ai/flows/extract-rate-con-flow.ts"
+    }
+  },
+  "edge": {}
+}

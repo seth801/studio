@@ -1,13 +1,11 @@
-import type {NextConfig} from 'next';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
   images: {
     remotePatterns: [
       {
@@ -30,6 +28,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  serverExternalPackages: [
+    'genkit',
+    '@genkit-ai/ai',
+    '@genkit-ai/core',
+    '@genkit-ai/google-genai',
+    '@genkit-ai/next',
+    '@genkit-ai/tools-common',
+    'google-auth-library',
+    'googleapis-common',
+    'gtoken',
+    'google-p12-pem',
+    'googleapis',
+    'agent-base',
+    'arrify',
+  ],
 };
 
 export default nextConfig;
