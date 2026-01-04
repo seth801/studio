@@ -74,6 +74,12 @@ export function AddLoadForm() {
     }
   };
 
+  const [processingStep, setProcessingStep] = useState<
+    'idle' | 'reading' | 'uploading' | 'analyzing' | 'complete'
+  >('idle');
+  // Store the base64 data URI of the uploaded rate confirmation for later display
+  const [rateConDataUri, setRateConDataUri] = useState<string | null>(null);
+
   const handleAnalyze = async () => {
     if (!selectedFile) {
       toast({
@@ -85,29 +91,47 @@ export function AddLoadForm() {
     }
 
     setIsAnalyzing(true);
+    setProcessingStep('reading');
+
     try {
       const reader = new FileReader();
       reader.readAsDataURL(selectedFile);
+
       reader.onload = async () => {
-        const rateConDataUri = reader.result as string;
+        setProcessingStep('uploading');
+        // Simulate a short delay for "uploading" to be visible
+        await new Promise((resolve) => setTimeout(resolve, 800));
 
-        const result = await extractRateCon({ rateConDataUri });
+        const dataUri = reader.result as string;
+        // Save the data URI for later use (compressed representation)
+        setRateConDataUri(dataUri);
 
-        setBroker(result.broker);
-        setLoadNumber(result.loadNumber);
-        if (result.stops && result.stops.length > 0) {
-          setStops(result.stops);
-        }
-        setCommodity(result.commodity);
-        setWeight(result.weight.toString());
-        setRate(result.rate.toString());
+        setProcessingStep('analyzing');
+        const result = await extractRateCon({ rateConDataUri: dataUri });
 
-        toast({
-          title: 'Analysis Complete',
-          description: 'Rate con details have been extracted.',
-        });
-        setActiveTab('manual');
+        setProcessingStep('complete');
+
+        // Small delay to show completion before switching tabs
+        setTimeout(() => {
+          setBroker(result.broker);
+          setLoadNumber(result.loadNumber);
+          if (result.stops && result.stops.length > 0) {
+            setStops(result.stops);
+          }
+          setCommodity(result.commodity);
+          setWeight(result.weight.toString());
+          setRate(result.rate.toString());
+
+          toast({
+            title: 'Analysis Complete',
+            description: 'Rate con details have been extracted.',
+          });
+          setActiveTab('manual');
+          setIsAnalyzing(false);
+          setProcessingStep('idle');
+        }, 1000);
       };
+
       reader.onerror = (error) => {
         console.error('Error reading file:', error);
         toast({
@@ -115,7 +139,9 @@ export function AddLoadForm() {
           title: 'File Read Error',
           description: 'Could not read the selected file.',
         });
-      }
+        setIsAnalyzing(false);
+        setProcessingStep('idle');
+      };
     } catch (error) {
       console.error('Error analyzing rate confirmation:', error);
       toast({
@@ -124,10 +150,34 @@ export function AddLoadForm() {
         description:
           'Could not analyze the rate confirmation. Please try again or enter details manually.',
       });
-    } finally {
       setIsAnalyzing(false);
+      setProcessingStep('idle');
     }
   };
+
+  // Helper to render steps
+  const steps = [
+    { id: 'reading', label: 'Reading file...' },
+    { id: 'uploading', label: 'Uploading to AI...' },
+    { id: 'analyzing', label: 'Extracting load details...' },
+    { id: 'complete', label: 'Finalizing...' },
+  ];
+
+  const getStepStatus = (stepId: string) => {
+    const stepOrder = ['idle', 'reading', 'uploading', 'analyzing', 'complete'];
+    const currentIndex = stepOrder.indexOf(processingStep);
+    const stepIndex = stepOrder.indexOf(stepId);
+
+    if (currentIndex > stepIndex) return 'completed';
+    if (currentIndex === stepIndex) return 'current';
+    return 'pending';
+  };
+
+  // ... (rest of component state)
+
+  // ...
+
+
 
   const handleStopChange = (index: number, field: keyof Stop, value: string) => {
     const newStops = [...stops];
@@ -193,6 +243,8 @@ export function AddLoadForm() {
         commodity: commodity,
         weight: weight,
         createdAt: new Date(),
+        // Store the compressed (base64) Rate Confirmation data URI if available
+        rateConDataUri: rateConDataUri || undefined,
       };
 
       const { db } = await import('@/lib/firebase');
@@ -273,27 +325,60 @@ export function AddLoadForm() {
           <TabsTrigger value="manual">Manual Entry</TabsTrigger>
         </TabsList>
         <TabsContent value="upload">
-          <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="flex flex-col items-center justify-center gap-2 text-center">
-              <UploadCloud className="h-10 w-10 text-muted-foreground" />
-              <h3 className="text-lg font-semibold">
-                Upload Rate Confirmation
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Drag and drop your PDF file here or click to browse.
-              </p>
-            </div>
-            <Input id="rate-con-file" type="file" onChange={handleFileChange} className="w-auto" />
-            <Button onClick={handleAnalyze} disabled={isAnalyzing}>
-              {isAnalyzing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Analyzing...
-                </>
-              ) : (
-                'Analyze Rate Con'
-              )}
-            </Button>
+          <div className="flex flex-col items-center justify-center gap-6 py-12">
+            {!isAnalyzing ? (
+              <>
+                <div className="flex flex-col items-center justify-center gap-2 text-center">
+                  <UploadCloud className="h-12 w-12 text-muted-foreground/50" />
+                  <h3 className="text-xl font-semibold">
+                    Upload Rate Confirmation
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    Upload an image (PNG, JPG) or PDF of your rate confirmation.
+                  </p>
+                </div>
+                <Input id="rate-con-file" type="file" accept="image/*,application/pdf" onChange={handleFileChange} className="w-full max-w-xs cursor-pointer" />
+                <Button onClick={handleAnalyze} size="lg" className="w-full max-w-xs">
+                  Analyze Rate Con
+                </Button>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-6 w-full max-w-sm animate-in fade-in duration-300">
+                <div className="flex flex-col gap-3 w-full">
+                  {steps.map((step) => {
+                    const status = getStepStatus(step.id);
+                    return (
+                      <div key={step.id} className="flex items-center gap-3">
+                        <div className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs transition-colors duration-300 
+                          ${status === 'completed' ? 'border-primary bg-primary text-primary-foreground' :
+                            status === 'current' ? 'border-primary border-2 text-primary animate-pulse' :
+                              'border-muted-foreground/30 text-muted-foreground/30'}`}>
+                          {status === 'completed' ? (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="h-3 w-3"
+                            >
+                              <polyline points="20 6 9 17 4 12" />
+                            </svg>
+                          ) : (
+                            <div className={`h-2 w-2 rounded-full ${status === 'current' ? 'bg-primary' : 'bg-muted-foreground/30'}`} />
+                          )}
+                        </div>
+                        <span className={`text-sm font-medium transition-colors duration-300 ${status === 'pending' ? 'text-muted-foreground/40' : 'text-foreground'}`}>
+                          {step.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="manual">

@@ -129,6 +129,9 @@ self.__SERVER_FILES_MANIFEST={
     "useFileSystemPublicRoutes": true,
     "experimental": {
       "ppr": false,
+      "serverActions": {
+        "bodySizeLimit": "10mb"
+      },
       "staleTimes": {
         "dynamic": 0,
         "static": 300

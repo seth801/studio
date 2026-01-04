@@ -7,11 +7,15 @@ import { allDrivers, allTrucks, initialLoadsData, type Load, type Stop } from '.
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, Clock, Truck, User, Milestone, Calendar, ArrowRight, Weight, Pencil, Loader2 } from 'lucide-react';
+import { MapPin, Clock, Truck, User, Milestone, Calendar as CalendarIcon, ArrowRight, Weight, Pencil, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { Calendar } from '@/components/ui/calendar';
+
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Input } from '@/components/ui/input';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 import { GoogleMapDirections } from './google-map-directions';
 
@@ -20,9 +24,9 @@ function GoogleMapEmbed({ stops }: { stops: { location: string }[] }) {
 }
 
 
-function RateConPdfViewer() {
-  // In a real app, you would fetch the PDF URL for the load
-  const pdfUrl = '/rate-con-placeholder.pdf';
+function RateConPdfViewer({ dataUri }: { dataUri?: string }) {
+  // Use stored data URI if available; fallback to placeholder PDF
+  const pdfUrl = dataUri || '/rate-con-placeholder.pdf';
 
   return (
     <Card>
@@ -70,8 +74,44 @@ function EditableStopLocation({ location, onSave }: { location: string; onSave: 
   );
 }
 
+// Editable date and time for a stop
+function EditableStopDateTime({ date, time, onSaveDate, onSaveTime }: { date: string; time: string; onSaveDate: (newDate: string) => void; onSaveTime: (newTime: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(date));
+  const [timeValue, setTimeValue] = useState<string>(time);
 
-export function LoadDetailsPage({ loadId }: { loadId: string }) {
+  const handleDateSelect = (d: Date | undefined) => {
+    if (!d) return;
+    setSelectedDate(d);
+    onSaveDate(d.toISOString().split('T')[0]);
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTimeValue(e.target.value);
+    onSaveTime(e.target.value);
+  };
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="sm" className="h-auto p-0">
+          <CalendarIcon className="h-4 w-4 mr-1" /> {date}
+          <Clock className="h-4 w-4 ml-2 mr-1" /> {time}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-2">
+        <Calendar mode="single" selected={selectedDate} onSelect={handleDateSelect} required={false} />
+        <div className="mt-2">
+          <label className="text-sm mr-2">Time:</label>
+          <Input type="time" value={timeValue} onChange={handleTimeChange} className="w-24" />
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+export default function LoadDetailsPage({ loadId }: { loadId: string }) {
+  const { toast } = useToast();
   const [currentLoad, setCurrentLoad] = useState<Load | undefined>(() => initialLoadsData.find((l) => l.id === loadId));
   const [isLoading, setIsLoading] = useState(!currentLoad);
 
@@ -119,7 +159,7 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
     notFound();
   }
 
-  const handleStopLocationChange = (stopIndex: number, newLocation: string) => {
+  const handleStopLocationChange = async (stopIndex: number, newLocation: string) => {
     const updatedStops = [...currentLoad.stops];
     updatedStops[stopIndex].location = newLocation;
 
@@ -133,7 +173,48 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
     }
 
     setCurrentLoad(updatedLoad);
-    // Here you would typically also update this in your backend/DB
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+      const fieldPath = `stops.${stopIndex}.location`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: newLocation }, { merge: true });
+      toast({ title: 'Stop location updated' });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Failed to update stop location' });
+    }
+  };
+
+  const handleStopDateChange = async (stopIndex: number, newDate: string) => {
+    const updatedStops = [...currentLoad.stops];
+    updatedStops[stopIndex].date = newDate;
+    setCurrentLoad({ ...currentLoad, stops: updatedStops });
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+      const fieldPath = `stops.${stopIndex}.date`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: newDate }, { merge: true });
+      toast({ title: 'Stop date updated' });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Failed to update stop date' });
+    }
+  };
+
+  const handleStopTimeChange = async (stopIndex: number, newTime: string) => {
+    const updatedStops = [...currentLoad.stops];
+    updatedStops[stopIndex].time = newTime;
+    setCurrentLoad({ ...currentLoad, stops: updatedStops });
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+      const fieldPath = `stops.${stopIndex}.time`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: newTime }, { merge: true });
+      toast({ title: 'Stop time updated' });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Failed to update stop time' });
+    }
   };
 
   const getDriverName = (driverId: string) => allDrivers.find(d => d.id === driverId)?.name || 'Unassigned';
@@ -181,10 +262,12 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
                       location={stop.location}
                       onSave={(newLocation) => handleStopLocationChange(index, newLocation)}
                     />
-                    <p className='text-sm text-muted-foreground flex items-center gap-2 mt-1'>
-                      <Calendar className='h-4 w-4' /> {stop.date}
-                      <Clock className='h-4 w-4 ml-2' /> {stop.time}
-                    </p>
+                    <EditableStopDateTime
+                      date={stop.date}
+                      time={stop.time}
+                      onSaveDate={(newDate) => handleStopDateChange(index, newDate)}
+                      onSaveTime={(newTime) => handleStopTimeChange(index, newTime)}
+                    />
                     {index > 0 && (
                       <p className='text-sm text-green-400 font-medium flex items-center gap-2 mt-1'>
                         ETA: in 2h 30m
@@ -213,7 +296,27 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
               <CardHeader className="pb-2">
                 <CardDescription>Status</CardDescription>
                 <CardTitle className="text-xl">
-                  <Badge variant={getStatusVariant(currentLoad.status)} className='text-md'>{currentLoad.status}</Badge>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                        <Badge variant={getStatusVariant(currentLoad.status)} className='text-md'>{currentLoad.status}</Badge>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                      <div className="space-y-2">
+                        <h4 className="font-medium mb-2">Edit Stops</h4>
+                        {currentLoad.stops.map((stop, idx) => (
+                          <EditableStopDateTime
+                            key={idx}
+                            date={stop.date}
+                            time={stop.time}
+                            onSaveDate={(newDate) => handleStopDateChange(idx, newDate)}
+                            onSaveTime={(newTime) => handleStopTimeChange(idx, newTime)}
+                          />
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -279,11 +382,10 @@ export function LoadDetailsPage({ loadId }: { loadId: string }) {
               </div>
             </CardContent>
           </Card>
-          <RateConPdfViewer />
+          <RateConPdfViewer dataUri={currentLoad.rateConDataUri} />
         </div>
 
       </main>
     </div>
   );
 }
-

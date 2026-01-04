@@ -4,7 +4,7 @@
       "workers": {
         "app/(admin)/admin/page": {
           "moduleId": 60726,
-          "async": true,
+          "async": false,
           "exportedName": "extractRateCon",
           "filename": "src/ai/flows/extract-rate-con-flow.ts"
         }

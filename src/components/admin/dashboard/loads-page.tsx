@@ -12,8 +12,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
+} from "@/components/ui/table";
+import { Trash2 } from 'lucide-react';
+import { Badge } from "@/components/ui/badge";
+import { useToast } from '@/hooks/use-toast';
 import { MoreHorizontal, ArrowUp, ArrowDown, ArrowUpDown, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -30,6 +32,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
+import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
@@ -56,7 +59,9 @@ export type Load = {
   perMileRate: number;
   rate: number;
   estProfit: number;
-  status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending';
+  status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending' | 'Cancelled';
+  // Optional base64 data URI of the uploaded Rate Confirmation PDF/image
+  rateConDataUri?: string;
 };
 
 export const initialLoadsData: Load[] = [
@@ -89,6 +94,7 @@ import { useEffect } from 'react';
 export function LoadsPage() {
   const [loads, setLoads] = useState<Load[]>(initialLoadsData);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Load; direction: 'ascending' | 'descending' } | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     let unsubscribe = () => { };
@@ -136,8 +142,8 @@ export function LoadsPage() {
     let sortableItems = [...loads];
     if (sortConfig !== null) {
       sortableItems.sort((a, b) => {
-        const aValue = a[sortConfig.key];
-        const bValue = b[sortConfig.key];
+        const aValue = a[sortConfig.key] ?? '';
+        const bValue = b[sortConfig.key] ?? '';
         if (aValue < bValue) {
           return sortConfig.direction === 'ascending' ? -1 : 1;
         }
@@ -158,6 +164,103 @@ export function LoadsPage() {
     setSortConfig({ key, direction });
   };
 
+  // Delete a load from Firestore and local state
+  const handleDeleteLoad = async (loadId: string) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, deleteDoc } = await import('firebase/firestore');
+      await deleteDoc(doc(db, 'loads', loadId));
+      // Remove from local state
+      setLoads(prev => prev.filter(l => l.id !== loadId));
+      toast({
+        title: 'Load Deleted',
+        description: `Load ${loadId} has been removed.`,
+      });
+    } catch (error) {
+      console.error('Error deleting load:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Delete Failed',
+        description: 'Could not delete the load. Please try again.',
+      });
+    }
+  };
+
+  // Cancel a load (set status to Cancelled)
+  const handleCancelLoad = async (loadId: string) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+      await setDoc(doc(db, 'loads', loadId), { status: 'Cancelled' }, { merge: true });
+      setLoads(prev =>
+        prev.map(l => (l.id === loadId ? { ...l, status: 'Cancelled' } : l))
+      );
+      toast({
+        title: 'Load Cancelled',
+        description: `Load ${loadId} has been cancelled.`,
+      });
+    } catch (error) {
+      console.error('Error cancelling load:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Cancel Failed',
+        description: 'Could not cancel the load. Please try again.',
+      });
+    }
+  };
+
+  // Update load status
+  const handleStatusChange = async (loadId: string, newStatus: Load['status']) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+      await setDoc(doc(db, 'loads', loadId), { status: newStatus }, { merge: true });
+      setLoads(prev =>
+        prev.map(l => (l.id === loadId ? { ...l, status: newStatus } : l))
+      );
+      toast({
+        title: 'Load Status Updated',
+        description: `Load ${loadId} status changed to ${newStatus}.`,
+      });
+    } catch (error) {
+      console.error('Error updating load status:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Status Update Failed',
+        description: 'Could not update load status. Please try again.',
+      });
+    }
+  };
+
+  const handleFieldChange = async (loadId: string, field: keyof Load, value: any) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+
+      // Special handling for Date objects to convert them to Firestore Timestamps
+      const fieldValue = value instanceof Date ? value : value;
+
+      await setDoc(doc(db, 'loads', loadId), { [field]: fieldValue }, { merge: true });
+
+      setLoads(prevLoads =>
+        prevLoads.map(load =>
+          load.id === loadId ? { ...load, [field]: value } : load
+        )
+      );
+      toast({
+        title: 'Load Updated',
+        description: `Load ${loadId} ${String(field)} updated.`,
+      });
+    } catch (error) {
+      console.error(`Error updating load field ${String(field)}:`, error);
+      toast({
+        variant: 'destructive',
+        title: 'Update Failed',
+        description: `Could not update ${String(field)}. Please try again.`,
+      });
+    }
+  };
+
   const getSortIndicator = (key: keyof Load) => {
     if (!sortConfig || sortConfig.key !== key) {
       return <ArrowUpDown className="ml-2 h-4 w-4" />;
@@ -176,18 +279,12 @@ export function LoadsPage() {
         return 'secondary';
       case 'Delivered':
         return 'outline';
+      case 'Cancelled':
+        return 'destructive';
       default:
         return 'default';
     }
   }
-
-  const handleFieldChange = (loadId: string, field: keyof Load, value: any) => {
-    setLoads(prevLoads =>
-      prevLoads.map(load =>
-        load.id === loadId ? { ...load, [field]: value } : load
-      )
-    );
-  };
 
   const getDriverName = (driverId: string) => {
     return allDrivers.find(d => d.id === driverId)?.name || 'Unassigned';
@@ -214,7 +311,7 @@ export function LoadsPage() {
             <TabsTrigger value="availability">Availability</TabsTrigger>
           </TabsList>
           <TabsContent value="table">
-            <div className="overflow-auto h-[60vh]">
+            <div className="overflow-auto max-h-[calc(100vh-320px)] rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -232,9 +329,7 @@ export function LoadsPage() {
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('rate')}>Rate {getSortIndicator('rate')}</Button></TableHead>
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('estProfit')}>Est Profit {getSortIndicator('estProfit')}</Button></TableHead>
                     <TableHead className="text-center"><Button variant="ghost" onClick={() => requestSort('status')}>Status {getSortIndicator('status')}</Button></TableHead>
-                    <TableHead>
-                      <span className="sr-only">Actions</span>
-                    </TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -324,29 +419,49 @@ export function LoadsPage() {
                       <TableCell className="text-center">${load.rate}</TableCell>
                       <TableCell className="text-center">${load.estProfit}</TableCell>
                       <TableCell className="text-center">
-                        <Badge variant={getStatusVariant(load.status)}>
-                          {load.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
+                            <Button variant="ghost" size="sm">
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button variant="ghost" size="sm">
+                                    <Badge variant={getStatusVariant(load.status)}>{load.status}</Badge>
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-2">
+                                  <div className="space-y-2">
+                                    <h4 className="font-medium mb-2">Edit Stops</h4>
+                                    {load.stops.map((stop, idx) => (
+                                      <div key={idx} className="flex items-center space-x-2 mb-2">
+                                        <Calendar mode="single" selected={new Date(stop.date)} onSelect={(date) => date && handleStopDateChange(load.id, idx, date.toISOString().split('T')[0])} />
+                                        <Input type="time" value={stop.time} onChange={(e) => handleStopTimeChange(load.id, idx, e.target.value)} className="w-24" />
+                                      </div>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Assign Driver/Truck</DropdownMenuItem>
-                            <DropdownMenuItem>Update Status</DropdownMenuItem>
+                            <DropdownMenuLabel>Status</DropdownMenuLabel>
+                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Booked')}>Booked</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'In-transit')}>In-transit</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Delivered')}>Delivered</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Pending')}>Pending</DropdownMenuItem>
+                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Cancelled')}>Cancelled</DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
+                      </TableCell>
+                      <TableCell className="flex space-x-2">
+                        <Link href={`/load/${load.id}`}>
+                          <Button variant="outline" size="sm">View</Button>
+                        </Link>
+                        <Button variant="destructive" size="sm" onClick={() => handleCancelLoad(load.id)}>
+                          Cancel
+                        </Button>
+                        <Button variant="destructive" size="sm" onClick={() => handleDeleteLoad(load.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -369,9 +484,9 @@ export function LoadsPage() {
               <p className="text-muted-foreground">Availability view coming soon.</p>
             </div>
           </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+        </Tabs >
+      </CardContent >
+    </Card >
   );
 }
 

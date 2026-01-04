@@ -74,7 +74,7 @@
         "x-next-revalidate-tag-token"
       ]
     },
-    "/driver": {
+    "/admin/settings": {
       "experimentalBypassFor": [
         {
           "type": "header",
@@ -87,8 +87,8 @@
         }
       ],
       "initialRevalidateSeconds": false,
-      "srcRoute": "/driver",
-      "dataRoute": "/driver.rsc",
+      "srcRoute": "/admin/settings",
+      "dataRoute": "/admin/settings.rsc",
       "allowHeader": [
         "host",
         "x-matched-path",

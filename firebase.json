@@ -13,7 +13,10 @@
     "rewrites": [
       {
         "source": "**",
-        "function": "ssridsops"
+        "run": {
+          "serviceId": "ssridsops",
+          "region": "us-central1"
+        }
       }
     ]
   },

@@ -19,7 +19,8 @@ interface GoogleMapDirectionsProps {
 }
 
 export function GoogleMapDirections({ stops }: GoogleMapDirectionsProps) {
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyARGWbMOdRsYzX3uHHwetNQ4g2IJFHv5ps';
+    const apiKey =
+        process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || 'AIzaSyBfwZK_tDPmaKHrorUBrggKNiuda5_DSZM';
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: apiKey,

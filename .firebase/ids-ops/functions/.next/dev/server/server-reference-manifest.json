@@ -1,0 +1,21 @@
+{
+  "node": {
+    "408ee1483bb0bd8321586cc6df5b2ef0fa484ac2ee": {
+      "workers": {
+        "app/(admin)/admin/page": {
+          "moduleId": "[project]/.next-internal/server/app/(admin)/admin/page/actions.js { ACTIONS_MODULE0 => \"[project]/src/ai/flows/extract-rate-con-flow.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": true,
+          "exportedName": "extractRateCon",
+          "filename": "src/ai/flows/extract-rate-con-flow.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/admin/page": "action-browser"
+      },
+      "filename": "src/ai/flows/extract-rate-con-flow.ts",
+      "exportedName": "extractRateCon"
+    }
+  },
+  "edge": {},
+  "encryptionKey": "i6iFHxBg/hC8dHOMkcGh6HbcbexlxPOevSu/tb8Ub7I="
+}

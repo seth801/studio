@@ -56,10 +56,10 @@
       "namedRegex": "^/admin(?:/)?$"
     },
     {
-      "page": "/driver",
-      "regex": "^/driver(?:/)?$",
+      "page": "/admin/settings",
+      "regex": "^/admin/settings(?:/)?$",
       "routeKeys": {},
-      "namedRegex": "^/driver(?:/)?$"
+      "namedRegex": "^/admin/settings(?:/)?$"
     },
     {
       "page": "/favicon.ico",
