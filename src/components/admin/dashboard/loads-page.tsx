@@ -35,50 +35,192 @@ import { Calendar } from "@/components/ui/calendar"
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { Address } from '@/types/address';
 
 
 export type Stop = {
   type: 'pickup' | 'delivery';
-  location: string;
+  address: Address;
   date: string;
   time: string;
+  companyName?: string;
+  referenceNotes?: string;
+  phoneNumber?: string;
+  instructions?: string;
+};
+
+export type LoadDocument = {
+  id: string;
+  type: 'RateConfirmation' | 'BOL' | 'Other';
+  url: string;
+  name: string;
+  uploadedAt: Date;
+  verification?: {
+    isMatch: boolean;
+    matchConfidence: number;
+    arrivalDate?: string | null;
+    arrivalTime?: string | null;
+    departureDate?: string | null;
+    departureTime?: string | null;
+    hasReceiverSignature: boolean;
+    signatureName?: string | null;
+    discrepancies: string[];
+  };
 };
 
 export type Load = {
   id: string;
   brokerName: string;
-  origin: string;
-  destination: string;
+  origin: Address;
+  destination: Address;
   pickupDate: Date;
   dropDate: Date;
   stops: Stop[];
   driver: string;
   truck: string;
+  trailer?: string;
   miles: number;
   hours: number;
   perMileRate: number;
   rate: number;
   estProfit: number;
-  status: 'Booked' | 'In-transit' | 'Delivered' | 'Pending' | 'Cancelled';
+  status: 'Booked' | 'En route' | 'Completed' | 'Rescheduled' | 'Canceled';
   // Optional base64 data URI of the uploaded Rate Confirmation PDF/image
-  rateConDataUri?: string;
+  rateConDataUri?: string; // Legacy field, keeping for compatibility
+  // Fine print details: late fees, detention charges, etc.
+  finePrint?: string;
+  documents: LoadDocument[];
 };
 
-export const initialLoadsData: Load[] = [
-  { id: 'LD-789012', brokerName: 'CH Robinson', origin: 'West Valley City, UT', destination: 'Boise, ID', pickupDate: new Date(2025, 11, 29), dropDate: new Date(2025, 11, 30), stops: [{ type: 'pickup', location: '123 Main St, West Valley City, UT 84119', date: '2025-12-29', time: '08:00 EST' }, { type: 'delivery', location: '456 Center St, Boise, ID 83702', date: '2025-12-30', time: '14:00 PST' }], driver: 'driver-007', truck: 'truck-a', miles: 342, hours: 6, perMileRate: 2.34, rate: 800, estProfit: 250, status: 'Booked' },
-  { id: 'LD-345678', brokerName: 'Total Quality', origin: 'Phoenix, AZ', destination: 'Denver, CO', pickupDate: new Date(2025, 11, 28), dropDate: new Date(2025, 11, 29), stops: [{ type: 'pickup', location: '789 Grand Ave, Phoenix, AZ 85001', date: '2025-12-28', time: '09:00 MST' }, { type: 'delivery', location: '101 Broadway, Denver, CO 80203', date: '2025-12-29', time: '16:00 MST' }], driver: 'driver-001', truck: 'truck-b', miles: 818, hours: 13, perMileRate: 1.47, rate: 1200, estProfit: 400, status: 'In-transit' },
-  { id: 'LD-901234', brokerName: 'Coyote', origin: 'Las Vegas, NV', destination: 'Los Angeles, CA', pickupDate: new Date(2025, 11, 27), dropDate: new Date(2025, 11, 27), stops: [{ type: 'pickup', location: '212 Fremont St, Las Vegas, NV 89101', date: '2025-12-27', time: '10:00 PST' }, { type: 'delivery', location: '313 Hollywood Blvd, Los Angeles, CA 90028', date: '2025-12-27', time: '15:00 PST' }], driver: 'driver-003', truck: 'truck-c', miles: 270, hours: 4, perMileRate: 2.22, rate: 600, estProfit: 200, status: 'Delivered' },
-  { id: 'LD-567890', brokerName: 'Echo Global', origin: 'San Francisco, CA', destination: 'Seattle, WA', pickupDate: new Date(2025, 11, 30), dropDate: new Date(2026, 0, 1), stops: [{ type: 'pickup', location: '414 Lombard St, San Francisco, CA 94133', date: '2025-12-30', time: '11:00 PST' }, { type: 'delivery', location: '515 Pike St, Seattle, WA 98101', date: '2026-01-01', time: '18:00 PST' }], driver: 'driver-009', truck: 'truck-d', miles: 808, hours: 13, perMileRate: 1.86, rate: 1500, estProfit: 500, status: 'Booked' },
-  { id: 'LD-123456', brokerName: 'CH Robinson', origin: 'Salt Lake City, UT', destination: 'Reno, NV', pickupDate: new Date(2025, 11, 26), dropDate: new Date(2025, 11, 27), stops: [{ type: 'pickup', location: '616 Temple Square, Salt Lake City, UT 84150', date: '2025-12-26', time: '12:00 MST' }, { type: 'delivery', location: '717 Virginia St, Reno, NV 89501', date: '2025-12-27', time: '19:00 PST' }], driver: 'driver-002', truck: 'truck-e', miles: 520, hours: 8, perMileRate: 1.44, rate: 750, estProfit: 225, status: 'Delivered' },
+export const initialLoadsData: Load[] = [];
+
+
+export type Driver = {
+  id: string; // Internal ID or Employee ID (100-XXX)
+  firstName: string;
+  lastName: string;
+  name: string; // Full Name
+  status: 'Active' | 'Applicant' | 'Terminated' | 'On Leave';
+
+  // Personal
+  dob?: string; // M/D/YYYY
+  age?: number;
+  phone?: string;
+  email?: string;
+  address?: Address;
+
+  // Employment
+  employeeId?: string; // 100-XXX
+  hireDate?: string;
+  terminationDate?: string; // Date Left IDS
+  terminationReason?: string;
+  yearsExperience?: number;
+  yearsWorking?: number; // yrs working
+  payRate?: string;
+  fuelCode?: string;
+
+  // License
+  licenseNumber?: string;
+  licenseState?: string;
+  licenseIssued?: string;
+  licenseExpiration?: string; // DL Exp - Watch for Alerts
+  cdl: boolean; // Checkbox
+
+  // Compliance & Certifications
+  samsara: boolean;
+  forkLiftCertExpiration?: string;
+  medicalCardExpiration?: string; // DOT Card Exp - Watch for Alerts
+  mvrAnnualDueDate?: string; // MVR Annual Due - Watch for Alerts
+  drugAlcoholClearinghouse: boolean; // FMCSA DA
+  lastRandomDrugTest?: string;
+  consentFmcsaDate?: string;
+
+  // Onboarding / Documents (Checkboxes mostly)
+  hasHandbook: boolean;
+  hasI9: boolean;
+  hasApplication: boolean;
+  hasRoadTest: boolean;
+  hasMedicalDeclaration: boolean;
+  hasDriversLicenseCopy: boolean;
+
+  // AI & Uploads
+  avatarUrl?: string; // AI Generated Avatar
+  finePrint?: string;
+  hasPev: boolean; // PEV
+  hasPreEmploymentDrugTest: boolean; // Pre E Drug
+  hasDrugAlcoholDocs: boolean;
+  isEntryLevel: boolean; // Entry level Cert
+  isMultiEmployer: boolean; // Multiple-Employer Drivers
+  moveToPrevious?: boolean;
+
+  // -- JOB APPLICATION FIELDS (New) --
+  // Safety & Eligibility
+  isCitizen?: boolean;
+  licenseSuspended?: boolean;
+  felonyConviction?: boolean;
+  drugTestRefusal?: boolean;
+  educationLevel?: string;
+
+  // Experience
+  equipmentExperience?: {
+    boxTruck?: boolean;
+    tractorTrailer?: boolean;
+    pickup?: boolean;
+  };
+
+  // History
+  previousEmployment?: {
+    employerName: string;
+    phone?: string;
+    startDate: string;
+    endDate: string;
+    reasonForLeaving?: string;
+    responsibilities?: string;
+  }[];
+
+  // Signature
+  signatureUrl?: string; // Data URI
+  applicationDate?: string;
+
+  // Verified File Paths (Firebase/Drive Links)
+  files?: {
+    driversLicense?: string;
+    medicalCard?: string;
+    mvr?: string;
+    roadTest?: string;
+    handbook?: string;
+    application?: string;
+  };
+};
+
+export const allDrivers: Driver[] = [
+  {
+    id: 'driver-007',
+    firstName: 'John',
+    lastName: 'Doe',
+    name: 'John Doe',
+    status: 'Active',
+    cdl: true,
+    samsara: true,
+    hasHandbook: true,
+    hasI9: true,
+    hasApplication: true,
+    hasRoadTest: true,
+    hasMedicalDeclaration: true,
+    hasDriversLicenseCopy: true,
+    hasPev: true,
+    hasPreEmploymentDrugTest: true,
+    hasDrugAlcoholDocs: true,
+    isEntryLevel: false,
+    isMultiEmployer: false,
+    drugAlcoholClearinghouse: true
+  },
+  { id: 'driver-009', firstName: 'Emily', lastName: 'Davis', name: 'Emily Davis', status: 'Active', cdl: true, samsara: true, hasHandbook: true, hasI9: true, hasApplication: true, hasRoadTest: true, hasMedicalDeclaration: true, hasPev: true, hasPreEmploymentDrugTest: true, hasDrugAlcoholDocs: true, hasDriversLicenseCopy: true, isEntryLevel: false, isMultiEmployer: false, drugAlcoholClearinghouse: true },
+  { id: 'driver-001', firstName: 'Jane', lastName: 'Smith', name: 'Jane Smith', status: 'Active', cdl: true, samsara: true, hasHandbook: true, hasI9: true, hasApplication: true, hasRoadTest: true, hasMedicalDeclaration: true, hasPev: true, hasPreEmploymentDrugTest: true, hasDrugAlcoholDocs: true, hasDriversLicenseCopy: true, isEntryLevel: false, isMultiEmployer: false, drugAlcoholClearinghouse: true },
+  { id: 'driver-002', firstName: 'Mike', lastName: 'Johnson', name: 'Mike Johnson', status: 'Active', cdl: true, samsara: true, hasHandbook: true, hasI9: true, hasApplication: true, hasRoadTest: true, hasMedicalDeclaration: true, hasPev: true, hasPreEmploymentDrugTest: true, hasDrugAlcoholDocs: true, hasDriversLicenseCopy: true, isEntryLevel: false, isMultiEmployer: false, drugAlcoholClearinghouse: true },
+  { id: 'driver-003', firstName: 'Chris', lastName: 'Lee', name: 'Chris Lee', status: 'Active', cdl: true, samsara: true, hasHandbook: true, hasI9: true, hasApplication: true, hasRoadTest: true, hasMedicalDeclaration: true, hasPev: true, hasPreEmploymentDrugTest: true, hasDrugAlcoholDocs: true, hasDriversLicenseCopy: true, isEntryLevel: false, isMultiEmployer: false, drugAlcoholClearinghouse: true },
 ];
 
-export const allDrivers = [
-  { id: 'driver-007', name: 'John Doe' },
-  { id: 'driver-009', name: 'Emily Davis' },
-  { id: 'driver-001', name: 'Jane Smith' },
-  { id: 'driver-002', name: 'Mike Johnson' },
-  { id: 'driver-003', name: 'Chris Lee' },
-];
 
 export const allTrucks = [
   { id: 'truck-a', name: 'TRUCK-A' },
@@ -88,11 +230,49 @@ export const allTrucks = [
   { id: 'truck-e', name: 'TRUCK-E' },
 ];
 
+export const allTrailers = [
+  { id: 'trailer-001', name: 'TRAILER-001' },
+  { id: 'trailer-002', name: 'TRAILER-002' },
+  { id: 'trailer-003', name: 'TRAILER-003' },
+  { id: 'trailer-004', name: 'TRAILER-004' },
+  { id: 'trailer-005', name: 'TRAILER-005' },
+];
+
 
 import { useEffect } from 'react';
 
+import { Skeleton } from '@/components/ui/skeleton';
+
+// Helper to safely display city, state from either old string format or new Address structure
+const displayCityState = (address: Address | string | undefined): string => {
+  if (!address) return '';
+
+  // If it's already an Address object
+  if (typeof address === 'object' && 'city' in address && 'state' in address) {
+    return `${address.city}, ${address.state}`;
+  }
+
+  // If it's still a string (old format), try to parse it
+  if (typeof address === 'string') {
+    // Use regex to extract city and state
+    const stateMatch = address.match(/\b([A-Z]{2})\b(?:\s+\d{5})?$/);
+    if (stateMatch) {
+      const state = stateMatch[1];
+      const beforeState = address.substring(0, stateMatch.index).trim().replace(/,\s*$/, '');
+      const parts = beforeState.split(',').map(s => s.trim());
+      const city = parts[parts.length - 1];
+      return `${city}, ${state}`;
+    }
+    return address; // Fallback to full string
+  }
+
+  return '';
+};
+
 export function LoadsPage() {
   const [loads, setLoads] = useState<Load[]>(initialLoadsData);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState<{ key: keyof Load; direction: 'ascending' | 'descending' } | null>(null);
   const { toast } = useToast();
 
@@ -128,9 +308,11 @@ export function LoadsPage() {
             }
             return initialLoadsData;
           });
+          setIsLoading(false);
         });
       } catch (error) {
         console.error('Error setting up Firestore listener:', error);
+        setIsLoading(false);
       }
     };
 
@@ -191,9 +373,9 @@ export function LoadsPage() {
     try {
       const { db } = await import('@/lib/firebase');
       const { doc, setDoc } = await import('firebase/firestore');
-      await setDoc(doc(db, 'loads', loadId), { status: 'Cancelled' }, { merge: true });
+      await setDoc(doc(db, 'loads', loadId), { status: 'Canceled' }, { merge: true });
       setLoads(prev =>
-        prev.map(l => (l.id === loadId ? { ...l, status: 'Cancelled' } : l))
+        prev.map(l => (l.id === loadId ? { ...l, status: 'Canceled' } : l))
       );
       toast({
         title: 'Load Cancelled',
@@ -261,6 +443,84 @@ export function LoadsPage() {
     }
   };
 
+  const handleStopDateChange = async (loadId: string, stopIndex: number, newDate: string) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+
+      // Update local state first
+      setLoads(prev =>
+        prev.map(l => {
+          if (l.id !== loadId) return l;
+          const updatedStops = [...l.stops];
+          updatedStops[stopIndex] = { ...updatedStops[stopIndex], date: newDate };
+          return { ...l, stops: updatedStops };
+        })
+      );
+
+      // Update Firestore
+      const fieldPath = `stops.${stopIndex}.date`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: newDate } as any, { merge: true });
+
+      toast({ title: 'Stop date updated' });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Failed to update stop date' });
+    }
+  };
+
+  const handleStopTimeChange = async (loadId: string, stopIndex: number, newTime: string) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+
+      // Update local state first
+      setLoads(prev =>
+        prev.map(l => {
+          if (l.id !== loadId) return l;
+          const updatedStops = [...l.stops];
+          updatedStops[stopIndex] = { ...updatedStops[stopIndex], time: newTime };
+          return { ...l, stops: updatedStops };
+        })
+      );
+
+      // Update Firestore
+      const fieldPath = `stops.${stopIndex}.time`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: newTime } as any, { merge: true });
+
+      toast({ title: 'Stop time updated' });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: 'Failed to update stop time' });
+    }
+  };
+
+  const handleStopFieldChange = async (loadId: string, stopIndex: number, field: keyof Stop, value: string) => {
+    try {
+      const { db } = await import('@/lib/firebase');
+      const { doc, setDoc } = await import('firebase/firestore');
+
+      // Update local state first
+      setLoads(prev =>
+        prev.map(l => {
+          if (l.id !== loadId) return l;
+          const updatedStops = [...l.stops];
+          updatedStops[stopIndex] = { ...updatedStops[stopIndex], [field]: value };
+          return { ...l, stops: updatedStops };
+        })
+      );
+
+      // Update Firestore
+      const fieldPath = `stops.${stopIndex}.${field}`;
+      await setDoc(doc(db, 'loads', loadId), { [fieldPath]: value } as any, { merge: true });
+
+      toast({ title: `Stop ${field} updated` });
+    } catch (e) {
+      console.error(e);
+      toast({ variant: 'destructive', title: `Failed to update stop ${field}` });
+    }
+  };
+
   const getSortIndicator = (key: keyof Load) => {
     if (!sortConfig || sortConfig.key !== key) {
       return <ArrowUpDown className="ml-2 h-4 w-4" />;
@@ -275,11 +535,13 @@ export function LoadsPage() {
     switch (status) {
       case 'Booked':
         return 'default';
-      case 'In-transit':
+      case 'En route':
         return 'secondary';
-      case 'Delivered':
+      case 'Completed':
         return 'outline';
-      case 'Cancelled':
+      case 'Rescheduled':
+        return 'default';
+      case 'Canceled':
         return 'destructive';
       default:
         return 'default';
@@ -333,138 +595,201 @@ export function LoadsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedLoads.map((load) => (
-                    <TableRow key={load.id}>
-                      <TableCell className="font-medium">
-                        <Link href={`/load/${load.id}`} className='text-primary hover:underline'>{load.id}</Link>
-                      </TableCell>
-                      <TableCell>{load.brokerName}</TableCell>
-                      <TableCell>{load.origin}</TableCell>
-                      <TableCell>{load.destination}</TableCell>
-                      <TableCell className="text-center">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-[140px] justify-start text-left font-normal",
-                                !load.pickupDate && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {load.pickupDate ? format(load.pickupDate, "M/d/yy") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={load.pickupDate}
-                              onSelect={(date) => handleFieldChange(load.id, 'pickupDate', date)}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-[140px] justify-start text-left font-normal",
-                                !load.dropDate && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {load.dropDate ? format(load.dropDate, "M/d/yy") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={load.dropDate}
-                              onSelect={(date) => handleFieldChange(load.id, 'dropDate', date)}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Select onValueChange={(value) => handleFieldChange(load.id, 'driver', value)} defaultValue={load.driver}>
-                          <SelectTrigger className='w-[150px]'>
-                            <SelectValue placeholder="Select driver" >{getDriverName(load.driver)}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {allDrivers.map(driver => (
-                              <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Select onValueChange={(value) => handleFieldChange(load.id, 'truck', value)} defaultValue={load.truck}>
-                          <SelectTrigger className='w-[120px]'>
-                            <SelectValue placeholder="Select truck">{getTruckName(load.truck)}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {allTrucks.map(truck => (
-                              <SelectItem key={truck.id} value={truck.id}>{truck.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className="text-center">{load.miles}</TableCell>
-                      <TableCell className="text-center">{load.hours}</TableCell>
-                      <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
-                      <TableCell className="text-center">${load.rate}</TableCell>
-                      <TableCell className="text-center">${load.estProfit}</TableCell>
-                      <TableCell className="text-center">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Popover>
-                                <PopoverTrigger asChild>
-                                  <Button variant="ghost" size="sm">
-                                    <Badge variant={getStatusVariant(load.status)}>{load.status}</Badge>
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-2">
-                                  <div className="space-y-2">
-                                    <h4 className="font-medium mb-2">Edit Stops</h4>
-                                    {load.stops.map((stop, idx) => (
-                                      <div key={idx} className="flex items-center space-x-2 mb-2">
-                                        <Calendar mode="single" selected={new Date(stop.date)} onSelect={(date) => date && handleStopDateChange(load.id, idx, date.toISOString().split('T')[0])} />
-                                        <Input type="time" value={stop.time} onChange={(e) => handleStopTimeChange(load.id, idx, e.target.value)} className="w-24" />
+                  {isLoading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell><Skeleton className="h-4 w-[80px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[120px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
+                        <TableCell><Skeleton className="h-4 w-[150px]" /></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-8 w-[140px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-8 w-[140px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[80px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[80px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[60px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[60px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[40px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[60px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-4 w-[60px]" /></div></TableCell>
+                        <TableCell className="text-center"><div className="flex justify-center"><Skeleton className="h-8 w-[100px]" /></div></TableCell>
+                        <TableCell className="text-right"><div className="flex justify-end"><Skeleton className="h-8 w-[50px]" /></div></TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    sortedLoads.map((load) => (
+                      <TableRow key={load.id}>
+                        <TableCell className="font-medium">
+                          <Link href={`/load/${load.id}`} className='text-primary hover:underline'>{load.id}</Link>
+                        </TableCell>
+                        <TableCell>{load.brokerName}</TableCell>
+                        <TableCell>{displayCityState(load.origin)}</TableCell>
+                        <TableCell>{displayCityState(load.destination)}</TableCell>
+                        <TableCell className="text-center">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-[140px] justify-start text-left font-normal",
+                                  !load.pickupDate && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {load.pickupDate ? format(load.pickupDate, "M/d/yy") : <span>Pick a date</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={load.pickupDate}
+                                onSelect={(date) => handleFieldChange(load.id, 'pickupDate', date)}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className={cn(
+                                  "w-[140px] justify-start text-left font-normal",
+                                  !load.dropDate && "text-muted-foreground"
+                                )}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {load.dropDate ? format(load.dropDate, "M/d/yy") : <span>Pick a date</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                              <Calendar
+                                mode="single"
+                                selected={load.dropDate}
+                                onSelect={(date) => handleFieldChange(load.id, 'dropDate', date)}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Select onValueChange={(value) => handleFieldChange(load.id, 'driver', value)} defaultValue={load.driver}>
+                            <SelectTrigger className='w-[150px]'>
+                              <SelectValue placeholder="Select driver" >{getDriverName(load.driver)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allDrivers.map(driver => (
+                                <SelectItem key={driver.id} value={driver.id}>{driver.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Select onValueChange={(value) => handleFieldChange(load.id, 'truck', value)} defaultValue={load.truck}>
+                            <SelectTrigger className='w-[120px]'>
+                              <SelectValue placeholder="Select truck">{getTruckName(load.truck)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {allTrucks.map(truck => (
+                                <SelectItem key={truck.id} value={truck.id}>{truck.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-center">{load.miles}</TableCell>
+                        <TableCell className="text-center">{load.hours}</TableCell>
+                        <TableCell className="text-center">${load.perMileRate.toFixed(2)}</TableCell>
+                        <TableCell className="text-center">${load.rate}</TableCell>
+                        <TableCell className="text-center">${load.estProfit}</TableCell>
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center gap-1">
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <Badge variant={getStatusVariant(load.status)}>{load.status}</Badge>
+                                </Button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-[600px] p-4 max-h-[80vh] overflow-y-auto">
+                                <div className="space-y-4">
+                                  <h4 className="font-medium mb-2">Edit Stop Details</h4>
+                                  {load.stops.map((stop, idx) => (
+                                    <div key={idx} className="border rounded-lg p-3 space-y-3">
+                                      <div className="font-medium text-sm capitalize">{stop.type} Stop {idx + 1}</div>
+                                      <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                          <label className="text-xs text-muted-foreground">Date</label>
+                                          <Calendar mode="single" selected={new Date(stop.date)} onSelect={(date) => date && handleStopDateChange(load.id, idx, date.toISOString().split('T')[0])} className="w-full" />
+                                        </div>
+                                        <div className="space-y-2">
+                                          <div>
+                                            <label className="text-xs text-muted-foreground">Time</label>
+                                            <Input type="time" value={stop.time} onChange={(e) => handleStopTimeChange(load.id, idx, e.target.value)} className="w-full" />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs text-muted-foreground">Company Name</label>
+                                            <Input value={stop.companyName || ''} onChange={(e) => handleStopFieldChange(load.id, idx, 'companyName', e.target.value)} placeholder="Enter company name" className="w-full" />
+                                          </div>
+                                          <div>
+                                            <label className="text-xs text-muted-foreground">Phone Number</label>
+                                            <Input value={stop.phoneNumber || ''} onChange={(e) => handleStopFieldChange(load.id, idx, 'phoneNumber', e.target.value)} placeholder="Enter phone number" className="w-full" />
+                                          </div>
+                                        </div>
                                       </div>
-                                    ))}
-                                  </div>
-                                </PopoverContent>
-                              </Popover>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Status</DropdownMenuLabel>
-                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Booked')}>Booked</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'In-transit')}>In-transit</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Delivered')}>Delivered</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Pending')}>Pending</DropdownMenuItem>
-                            <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Cancelled')}>Cancelled</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                      <TableCell className="flex space-x-2">
-                        <Link href={`/load/${load.id}`}>
-                          <Button variant="outline" size="sm">View</Button>
-                        </Link>
-                        <Button variant="destructive" size="sm" onClick={() => handleCancelLoad(load.id)}>
-                          Cancel
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => handleDeleteLoad(load.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">Reference Notes</label>
+                                        <textarea
+                                          value={stop.referenceNotes || ''}
+                                          onChange={(e) => handleStopFieldChange(load.id, idx, 'referenceNotes', e.target.value)}
+                                          placeholder="Enter reference notes"
+                                          className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-muted-foreground">Instructions</label>
+                                        <textarea
+                                          value={stop.instructions || ''}
+                                          onChange={(e) => handleStopFieldChange(load.id, idx, 'instructions', e.target.value)}
+                                          placeholder="Enter instructions"
+                                          className="w-full min-h-[60px] rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                        />
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-8 w-8">
+                                  <span className="sr-only">Change status</span>
+                                  ⋮
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Status</DropdownMenuLabel>
+                                <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Booked')}>Booked</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'En route')}>En route</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Completed')}>Completed</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Rescheduled')}>Rescheduled</DropdownMenuItem>
+                                <DropdownMenuItem onSelect={() => handleStatusChange(load.id, 'Canceled')}>Canceled</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </TableCell>
+                        <TableCell className="flex space-x-2">
+                          <Link href={`/load/${load.id}`}>
+                            <Button variant="outline" size="sm">View</Button>
+                          </Link>
+                          <Button variant="destructive" size="sm" onClick={() => handleCancelLoad(load.id)}>
+                            Cancel
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={() => handleDeleteLoad(load.id)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </div>

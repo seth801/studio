@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle, PanelLeft, Calculator } from 'lucide-react';
+import { Package, Truck, MapPin, Activity, MoreHorizontal, UserCircle, Search, CreditCard, PlusCircle, PanelLeft, Calculator, Settings as SettingsIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,6 +32,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { SidebarProvider, Sidebar, SidebarTrigger } from '@/components/ui/sidebar';
 import { DriversPage } from './drivers-page';
 import { LoadCalculatorPage } from './load-calculator-page';
+import { SettingsPage } from './settings-page';
 import { Logo } from '@/components/icons/logo';
 
 export function DeliveryOpsDashboard() {
@@ -54,55 +55,62 @@ export function DeliveryOpsDashboard() {
   };
 
   const NavContent = () => (
-    <nav className="grid items-start px-4 text-sm font-medium">
+    <nav className="grid items-start px-4 group-data-[collapsible=icon]:pr-4 pr-6 text-sm font-medium">
       <button
         onClick={() => setActiveView('runs')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'runs' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'runs' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <MapPin className="h-4 w-4" />
+        <MapPin className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Active Runs</span>
       </button>
       <button
         onClick={() => setActiveView('loads')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'loads' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <Package className="h-4 w-4" />
+        <Package className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Loads</span>
       </button>
       <button
         onClick={() => setActiveView('trucks')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'trucks' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <Truck className="h-4 w-4" />
+        <Truck className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Trucks</span>
       </button>
       <button
         onClick={() => setActiveView('drivers')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'drivers' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'drivers' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <UserCircle className="h-4 w-4" />
+        <UserCircle className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Drivers</span>
       </button>
       <button
         onClick={() => setActiveView('calculator')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'calculator' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'calculator' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <Calculator className="h-4 w-4" />
+        <Calculator className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Load Calculator</span>
       </button>
       <button
         onClick={() => setActiveView('status')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'status' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'status' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <Activity className="h-4 w-4" />
+        <Activity className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>System Status</span>
       </button>
       <button
         onClick={() => setActiveView('billing')}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'billing' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'billing' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
       >
-        <CreditCard className="h-4 w-4" />
+        <CreditCard className="h-5 w-5" />
         <span className='group-data-[collapsible=icon]:hidden'>Billing</span>
+      </button>
+      <button
+        onClick={() => setActiveView('settings')}
+        className={`flex items-center group-data-[collapsible=icon]:justify-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary ${activeView === 'settings' ? 'bg-muted text-primary' : 'text-muted-foreground'}`}
+      >
+        <SettingsIcon className="h-5 w-5" />
+        <span className='group-data-[collapsible=icon]:hidden'>Settings</span>
       </button>
     </nav>
   );
@@ -244,6 +252,8 @@ export function DeliveryOpsDashboard() {
         return <LoadCalculatorPage />;
       case 'billing':
         return <BillingPage />;
+      case 'settings':
+        return <SettingsPage />;
       default:
         return <div>Select a view</div>;
     }
@@ -255,10 +265,7 @@ export function DeliveryOpsDashboard() {
         <Sidebar collapsible="icon" className="hidden border-r bg-card lg:block">
           <div className="flex h-full max-h-screen flex-col gap-2">
             <div className="flex h-[60px] items-center border-b px-6">
-              <a href="/" className="flex items-center gap-2 font-semibold">
-                <Logo className="h-8 w-8 text-primary" />
-                <span className="group-data-[collapsible=icon]:hidden">Ideal Delivery Ops</span>
-              </a>
+              <span className="font-semibold group-data-[collapsible=icon]:hidden">Ideal Delivery Ops</span>
             </div>
             <div className="flex-1 overflow-auto py-2">
               <NavContent />
@@ -276,10 +283,7 @@ export function DeliveryOpsDashboard() {
               </SheetTrigger>
               <SheetContent side="left" className="sm:max-w-xs bg-card p-0">
                 <div className="flex h-[60px] items-center border-b px-6">
-                  <a href="/" className="flex items-center gap-2 font-semibold">
-                    <Logo className="h-8 w-8 text-primary" />
-                    <span className="">Ideal Delivery Ops</span>
-                  </a>
+                  <span className="font-semibold">Ideal Delivery Ops</span>
                 </div>
                 <div className="flex-1 overflow-auto py-2">
                   <NavContent />
@@ -321,7 +325,7 @@ export function DeliveryOpsDashboard() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveView('settings')}>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuItem>Logout</DropdownMenuItem>
               </DropdownMenuContent>

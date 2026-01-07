@@ -58,8 +58,8 @@ export function AddLoadForm() {
   const [driver, setDriver] = useState('');
 
   const [stops, setStops] = useState<Stop[]>([
-    { type: 'pickup', location: '', date: '', time: '' },
-    { type: 'delivery', location: '', date: '', time: '' },
+    { type: 'pickup', address: { street: '', city: '', state: '', zipcode: '', country: 'USA' }, date: '', time: '' },
+    { type: 'delivery', address: { street: '', city: '', state: '', zipcode: '', country: 'USA' }, date: '', time: '' },
   ]);
 
   const [commodity, setCommodity] = useState('');
@@ -111,25 +111,77 @@ export function AddLoadForm() {
 
         setProcessingStep('complete');
 
-        // Small delay to show completion before switching tabs
-        setTimeout(() => {
-          setBroker(result.broker);
-          setLoadNumber(result.loadNumber);
-          if (result.stops && result.stops.length > 0) {
-            setStops(result.stops);
-          }
-          setCommodity(result.commodity);
-          setWeight(result.weight.toString());
-          setRate(result.rate.toString());
+        // Auto-populate form state (for potential future reference)
+        setBroker(result.broker);
+        setLoadNumber(result.loadNumber);
+        if (result.stops && result.stops.length > 0) {
+          setStops(result.stops);
+        }
+        setCommodity(result.commodity);
+        setWeight(result.weight.toString());
+        setRate(result.rate.toString());
 
-          toast({
-            title: 'Analysis Complete',
-            description: 'Rate con details have been extracted.',
-          });
-          setActiveTab('manual');
-          setIsAnalyzing(false);
-          setProcessingStep('idle');
-        }, 1000);
+        // Small delay to show completion 
+        await new Promise((resolve) => setTimeout(resolve, 800));
+
+        // Auto-save the extracted load without showing the data
+        const mockId = result.loadNumber;
+
+        // Calculate origin and destination from stops
+        const firstStop = result.stops[0];
+        const lastStop = result.stops[result.stops.length - 1];
+
+        // Convert Address to legacy format for compatibility
+        const origin = typeof firstStop.address === 'object'
+          ? `${firstStop.address.city}, ${firstStop.address.state}`
+          : firstStop.address;
+        const destination = typeof lastStop.address === 'object'
+          ? `${lastStop.address.city}, ${lastStop.address.state}`
+          : lastStop.address;
+
+        // Parse dates
+        const pickupDateStr = firstStop.date;
+        const dropDateStr = lastStop.date;
+        const pickupDate = pickupDateStr ? new Date(pickupDateStr) : new Date();
+        const dropDate = dropDateStr ? new Date(dropDateStr) : new Date();
+
+        const loadData = {
+          id: mockId,
+          brokerName: result.broker,
+          origin,
+          destination,
+          pickupDate: pickupDate,
+          dropDate: dropDate,
+          stops: result.stops,
+          driver: 'unassigned',
+          truck: 'unassigned',
+          miles: 450, // Default
+          hours: 8,   // Default
+          perMileRate: result.rate / 450,
+          rate: result.rate,
+          estProfit: result.rate * 0.3,
+          status: 'Booked',
+          commodity: result.commodity,
+          weight: result.weight.toString(),
+          createdAt: new Date(),
+          rateConDataUri: dataUri,
+        };
+
+        const { db } = await import('@/lib/firebase');
+        const { doc, setDoc } = await import('firebase/firestore');
+
+        await setDoc(doc(db, 'loads', mockId), loadData);
+
+        setSavedLoadId(mockId);
+        setIsSaved(true);
+
+        toast({
+          title: 'Load Created',
+          description: `Load ${mockId} has been extracted and saved successfully.`,
+        });
+
+        setIsAnalyzing(false);
+        setProcessingStep('idle');
       };
 
       reader.onerror = (error) => {
@@ -201,7 +253,7 @@ export function AddLoadForm() {
 
   const handleSave = async () => {
     // Validation
-    if (!broker || !loadNumber || stops.some(s => !s.location)) {
+    if (!broker || !loadNumber || stops.some(s => !s.address.city || !s.address.state)) {
       toast({
         variant: 'destructive',
         title: 'Missing information',
@@ -215,8 +267,8 @@ export function AddLoadForm() {
       const mockId = loadNumber;
 
       // Calculate origin and destination from stops
-      const origin = stops[0].location.split(',').slice(0, 2).join(', ');
-      const destination = stops[stops.length - 1].location.split(',').slice(0, 2).join(', ');
+      const origin = `${stops[0].address.city}, ${stops[0].address.state}`;
+      const destination = `${stops[stops.length - 1].address.city}, ${stops[stops.length - 1].address.state}`;
 
       // Parse dates for the load object
       const pickupDateStr = stops[0].date;
@@ -277,8 +329,8 @@ export function AddLoadForm() {
     setTruck('');
     setDriver('');
     setStops([
-      { type: 'pickup', location: '', date: '', time: '' },
-      { type: 'delivery', location: '', date: '', time: '' },
+      { type: 'pickup', address: { street: '', city: '', state: '', zipcode: '', country: 'USA' }, date: '', time: '' },
+      { type: 'delivery', address: { street: '', city: '', state: '', zipcode: '', country: 'USA' }, date: '', time: '' },
     ]);
     setCommodity('');
     setWeight('');

@@ -10,6 +10,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { z } from 'zod';
+import { Address } from '@/types/address';
 
 const ExtractRateConInputSchema = z.object({
   rateConDataUri: z
@@ -20,11 +21,23 @@ const ExtractRateConInputSchema = z.object({
 });
 export type ExtractRateConInput = z.infer<typeof ExtractRateConInputSchema>;
 
+const AddressSchema = z.object({
+  street: z.string().describe('The street address.'),
+  city: z.string().describe('The city name.'),
+  state: z.string().describe('The state code (2 letters, e.g., UT, ID).'),
+  zipcode: z.string().describe('The zip code.'),
+  country: z.string().nullable().default('USA').transform(val => val || 'USA').describe('The country, defaults to USA.'),
+});
+
 const StopSchema = z.object({
   type: z.enum(['pickup', 'delivery']).describe('The type of stop.'),
-  location: z.string().describe('The location address for the stop.'),
+  address: AddressSchema.describe('The structured address for this stop.'),
   date: z.string().describe('The date for the stop.'),
   time: z.string().describe('The time or time window for the stop.'),
+  companyName: z.string().nullish().describe('The company name at this stop location.'),
+  phoneNumber: z.string().nullish().describe('The phone number for this stop location.'),
+  referenceNotes: z.string().nullish().describe('Reference numbers like PO#, BOL#, or other identifiers.'),
+  instructions: z.string().nullish().describe('Special instructions for this stop (dock hours, contact person, etc.).'),
 });
 export type Stop = z.infer<typeof StopSchema>;
 
@@ -36,6 +49,7 @@ const ExtractRateConOutputSchema = z.object({
   commodity: z.string().describe('The type of commodity being shipped.'),
   weight: z.number().describe('The weight of the load in pounds (lbs).'),
   rate: z.number().describe('The flat rate for the load in dollars.'),
+  finePrint: z.string().nullish().describe('Fine print details including late fees, detention charges, layover fees, and other contractual terms.'),
 });
 export type ExtractRateConOutput = z.infer<typeof ExtractRateConOutputSchema>;
 
@@ -91,15 +105,46 @@ export async function extractRateCon(input: ExtractRateConInput): Promise<Extrac
   "broker": "Company name",
   "loadNumber": "Load number",
   "stops": [
-    {"type": "pickup", "location": "address", "date": "date", "time": "time"},
-    {"type": "delivery", "location": "address", "date": "date", "time": "time"}
+    {
+      "type": "pickup",
+      "address": {
+        "street": "123 Main St",
+        "city": "City Name",
+        "state": "UT",
+        "zipcode": "12345",
+        "country": "USA"
+      },
+      "date": "date",
+      "time": "time",
+      "companyName": "company name at this location",
+      "phoneNumber": "phone number",
+      "referenceNotes": "PO#, BOL#, or other reference numbers",
+      "instructions": "special instructions, dock hours, contact person, etc."
+    },
+    {
+      "type": "delivery",
+      "address": {
+        "street": "456 Delivery Rd",
+        "city": "City Name",
+        "state": "ID",
+        "zipcode": "54321",
+        "country": "USA"
+      },
+      "date": "date",
+      "time": "time",
+      "companyName": "company name at this location",
+      "phoneNumber": "phone number",
+      "referenceNotes": "PO#, BOL#, or other reference numbers",
+      "instructions": "special instructions, dock hours, contact person, etc."
+    }
   ],
   "commodity": "Item description",
   "weight": 0,
-  "rate": 0
+  "rate": 0,
+  "finePrint": "Late fees, detention charges, layover fees, insurance requirements, and any other contractual terms or fine print"
 }
 
-Return ONLY valid JSON. weight and rate must be numbers. If information is not visible, use reasonable defaults.`,
+Return ONLY valid JSON. weight and rate must be numbers. For each stop, break down the address into separate street, city, state (2-letter code), and zipcode fields. Extract all available stop details including company names, phone numbers, reference numbers, and special instructions. Include any fine print, late fees, or contractual terms in the finePrint field. If information is not visible, omit the optional fields.`,
     ]);
 
     const response = await result.response;
